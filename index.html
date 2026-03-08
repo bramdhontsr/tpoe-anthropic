@@ -1,1066 +1,1091 @@
-<!doctype html>
-<html lang="nl">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>le moment dansa — paper</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>An Interactive Exploration of A003558 — D'Hont et al. 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Fira+Code:wght@300;400&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&display=swap" rel="stylesheet">
 <style>
-:root{
-  --ink:#ffe;
-  --accent:#ff2a6d;
-  --overlay2:rgba(0,0,0,.62);
-  --line:rgba(255,255,255,.10);
-  --gutter: clamp(16px,6vw,64px);
-  --content-max: 1120px;
-  --panel-pad-y: clamp(28px,4vw,52px);
-  --col-gap: clamp(16px,3vw,36px);
-  --card-bg: rgba(0,0,0,.22);
-  --side-w: 340px;
-  --title-font:"Corbel",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+:root {
+  --ink: #1a1610;
+  --paper: #f5f0e8;
+  --paper-dark: #ede8dc;
+  --accent: #2a4a7f;
+  --accent-warm: #7f3a1a;
+  --rule: #c8bfa8;
+  --muted: #6a6055;
+  --cyan: #0097a7;
+  --red: #c62828;
+  --gold: #c49a00;
+  --green: #2e7d32;
+  --purple: #6a1b9a;
 }
 
-*{ box-sizing:border-box; margin:0; padding:0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-body{
-  font-family:-apple-system,BlinkMacSystemFont,"Corbel",Oxygen,Ubuntu,Cantarell,"Helvetica Neue",Arial,sans-serif;
-  color:var(--ink);
-  background:#0a0a0f;
-  line-height:1.65;
-}
-a{ color:inherit; text-decoration:none; }
-a:hover{ color:#fff; }
-
-/* ── FIXED BACKGROUND ─────────────────────────────── */
-#bg{
-  position:fixed; inset:0; z-index:-1; overflow:hidden;
-  background:linear-gradient(160deg,#0a0a0f 0%,#0d0a18 40%,#0a0f0d 100%);
-}
-#bg::after{
-  content:"";
-  position:absolute; inset:0;
-  background:radial-gradient(ellipse at 30% 60%,rgba(255,42,109,.04) 0%,transparent 60%),
-             radial-gradient(ellipse at 75% 20%,rgba(20,80,200,.04) 0%,transparent 55%);
+body {
+  background: #2a2520;
+  font-family: 'Crimson Pro', Georgia, serif;
+  color: var(--ink);
+  line-height: 1;
 }
 
-/* ── HERO ─────────────────────────────────────────── */
-header.hero{
-  position:relative;
-  width:100%;
-  padding: clamp(60px,10vh,120px) var(--gutter) clamp(40px,6vh,80px);
-  border-bottom:1px solid var(--line);
-}
-.hero-inner{
-  max-width:var(--content-max);
-  margin:0 auto;
-  display:grid;
-  grid-template-columns: 1fr var(--side-w);
-  gap:1.5rem var(--col-gap);
-  align-items:end;
-}
-.hero-title{
-  font-size:clamp(2.4rem,6vw,5rem);
-  font-weight:300;
-  letter-spacing:.04em;
-  line-height:1.08;
-  font-family:var(--title-font);
-}
-.hero-title em{
-  color:var(--accent);
-  font-style:italic;
-}
-.hero-sub{
-  margin-top:.9rem;
-  font-size:clamp(.9rem,1.4vw,1.05rem);
-  opacity:.58;
-  letter-spacing:.06em;
-  line-height:1.6;
-}
-.hero-meta{
-  display:flex;
-  flex-direction:column;
-  gap:.55rem;
-  text-align:right;
-}
-.hero-tag{
-  display:inline-block;
-  padding:.22rem .62rem;
-  border:1px solid rgba(255,42,109,.4);
-  color:var(--accent);
-  font-family:"Courier New",monospace;
-  font-size:.7rem;
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  align-self:flex-end;
-}
-.hero-info{
-  font-size:.72rem;
-  font-family:"Courier New",monospace;
-  letter-spacing:.1em;
-  opacity:.38;
-  line-height:1.9;
-  text-align:right;
+.page-wrap {
+  max-width: 860px;
+  margin: 48px auto;
+  background: var(--paper);
+  box-shadow: 0 8px 80px rgba(0,0,0,0.5);
 }
 
-/* ── NAV ──────────────────────────────────────────── */
-nav.paper-nav{
-  position:sticky;
-  top:0;
-  z-index:50;
-  background:rgba(10,10,15,.88);
-  backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--line);
+/* ── Cover band ── */
+.cover {
+  background: #1a1610;
+  color: #e8e0d0;
+  padding: 56px 72px 44px;
+  border-bottom: 3px solid #c49a00;
 }
-.nav-inner{
-  max-width:var(--content-max);
-  margin:0 auto;
-  padding:0 var(--gutter);
-  display:flex;
-  gap:0;
-  overflow-x:auto;
-  scrollbar-width:none;
+.cover-label {
+  font-family: 'Fira Code', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: #c49a00;
+  margin-bottom: 28px;
+  opacity: 0.9;
 }
-.nav-inner::-webkit-scrollbar{ display:none; }
-.nav-tab{
-  padding:.62rem .9rem;
-  font-size:.63rem;
-  letter-spacing:.16em;
-  text-transform:uppercase;
-  font-family:"Courier New",monospace;
-  cursor:pointer;
-  color:rgba(255,254,238,.38);
-  border-bottom:2px solid transparent;
-  white-space:nowrap;
-  transition:color .15s, border-color .15s;
-  user-select:none;
-  background:none;
-  border-top:none;
-  border-left:none;
-  border-right:none;
-  flex-shrink:0;
+.cover h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-size: 32px;
+  line-height: 1.2;
+  color: #f0ead8;
+  margin-bottom: 8px;
+  letter-spacing: 0.01em;
 }
-.nav-tab:hover{ color:rgba(255,254,238,.72); }
-.nav-tab.active{
-  color:var(--accent);
-  border-bottom-color:var(--accent);
+.cover h1 em { font-style: italic; color: #c49a00; }
+.cover-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 15px;
+  font-weight: 300;
+  color: #a09080;
+  margin-bottom: 32px;
+  letter-spacing: 0.05em;
 }
-
-/* ── PANEL / SLICE ────────────────────────────────── */
-section.panel{ position:relative; padding:0; }
-section.panel .shade2{
-  position:absolute; inset:0;
-  background:var(--overlay2);
-  pointer-events:none;
+.authors {
+  font-size: 13px;
+  color: #c8bfa8;
+  line-height: 1.8;
 }
-.slice{
-  position:relative;
-  border-bottom:1px solid var(--line);
-}
-.slice .inner{
-  max-width:var(--content-max);
-  margin:0 auto;
-  padding:var(--panel-pad-y) var(--gutter);
-  display:grid;
-  grid-template-columns: minmax(0,1fr) var(--side-w);
-  gap:1rem var(--col-gap);
-  align-items:start;
-}
-.slice h3{
-  font-size:clamp(1.35rem,2.6vw,2rem);
-  font-weight:300;
-  line-height:1.2;
-}
-.kicker{
-  display:inline-block;
-  margin:.9rem 0 0;
-  font-size:.8rem;
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  opacity:.55;
-  font-family:"Courier New",monospace;
-}
-.text{
-  font-size:clamp(.95rem,1.4vw,1.05rem);
-  opacity:.92;
+.authors span { color: #e8e0d0; }
+.cover-meta {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #3a3020;
+  font-family: 'Fira Code', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: #5a5040;
+  display: flex;
+  gap: 32px;
 }
 
-/* ── CARD ─────────────────────────────────────────── */
-.card{
-  background:var(--card-bg);
-  border-radius:0;
-  overflow:hidden;
-}
-.pad{ padding:16px; }
-.card h4{
-  font-weight:300;
-  font-size:1.05rem;
-  margin:0 0 .65rem;
-  letter-spacing:.04em;
-  border-bottom:1px solid var(--line);
-  padding-bottom:.55rem;
+/* ── Main content ── */
+.content {
+  padding: 52px 72px;
 }
 
-/* ── PAPER TYPOGRAPHY ─────────────────────────────── */
-.section-label{
-  display:inline-block;
-  padding:.22rem .55rem;
-  border:1px solid rgba(255,42,109,.38);
-  color:var(--accent);
-  font-family:"Courier New",monospace;
-  font-size:.65rem;
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  margin-bottom:.9rem;
+/* Abstract */
+.abstract {
+  background: var(--paper-dark);
+  border-left: 3px solid var(--accent);
+  padding: 24px 28px;
+  margin-bottom: 48px;
+}
+.abstract-label {
+  font-family: 'Fira Code', monospace;
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+.abstract p {
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: #2a2520;
 }
 
-.paper-h2{
-  font-size:clamp(1rem,1.7vw,1.25rem);
-  font-weight:300;
-  letter-spacing:.06em;
-  margin:2rem 0 .55rem;
-  padding-bottom:.3rem;
-  border-bottom:1px solid rgba(255,254,238,.1);
-  color:var(--ink);
+/* Sections */
+h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 20px;
+  color: var(--accent);
+  margin: 44px 0 16px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: 0.02em;
 }
-.paper-h2:first-child{ margin-top:.4rem; }
+h2 .sec-num {
+  font-weight: 300;
+  color: var(--muted);
+  margin-right: 10px;
+  font-size: 14px;
+}
+h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--accent-warm);
+  margin: 28px 0 10px;
+  letter-spacing: 0.01em;
+}
+h3 .sec-num { font-weight: 300; color: var(--muted); margin-right: 8px; font-size: 13px; }
 
-.paper-h3{
-  font-size:.82rem;
-  font-weight:400;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-  opacity:.52;
-  margin:1.4rem 0 .42rem;
-  font-family:"Courier New",monospace;
-}
+p { font-size: 14px; line-height: 1.78; margin-bottom: 14px; color: #1e1a14; }
+p:last-child { margin-bottom: 0; }
 
-.paper-body{
-  font-size:clamp(.88rem,1.25vw,.98rem);
-  line-height:1.82;
-  opacity:.88;
+.math {
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+  background: var(--paper-dark);
+  padding: 2px 6px;
+  border-radius: 2px;
+  color: var(--accent);
 }
-.paper-body p{ margin-bottom:.85rem; }
-.paper-body p:last-child{ margin-bottom:0; }
-.paper-body em{ color:rgba(255,254,238,.75); font-style:italic; }
-.paper-body strong{ color:var(--ink); font-weight:500; letter-spacing:.01em; }
-.paper-body .hi{ color:var(--accent); }
-.paper-body .num{ color:var(--accent); font-family:"Courier New",monospace; font-size:.9em; }
-
-.paper-formula{
-  font-family:"Courier New",monospace;
-  font-size:.82rem;
-  letter-spacing:.06em;
-  color:var(--accent);
-  background:rgba(255,42,109,.055);
-  border-left:2px solid rgba(255,42,109,.32);
-  padding:.6rem 1rem;
-  margin:1rem 0;
-  line-height:1.7;
-}
-
-.paper-table{
-  width:100%;
-  border-collapse:collapse;
-  font-size:.74rem;
-  font-family:"Courier New",monospace;
-  margin:1rem 0;
-  letter-spacing:.03em;
-}
-.paper-table th{
-  text-align:left;
-  padding:.32rem .6rem;
-  background:rgba(255,254,238,.04);
-  border-bottom:1px solid rgba(255,254,238,.12);
-  font-weight:400;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-  font-size:.62rem;
-  opacity:.55;
-}
-.paper-table td{
-  padding:.3rem .6rem;
-  border-bottom:1px solid rgba(255,254,238,.045);
-  vertical-align:top;
-  line-height:1.5;
-  opacity:.82;
-}
-.paper-table tr:last-child td{ border-bottom:0; }
-.paper-table td.pk{ color:var(--accent); opacity:1; font-weight:500; }
-.paper-table tr:hover td{ background:rgba(255,254,238,.025); }
-
-.paper-note{
-  border-left:2px solid rgba(255,254,238,.2);
-  padding:.55rem .9rem;
-  margin:.85rem 0;
-  font-size:.84rem;
-  opacity:.68;
-  line-height:1.68;
-  font-family:"Courier New",monospace;
-  letter-spacing:.02em;
-}
-.paper-note.warn{ border-color:rgba(255,42,109,.42); color:rgba(255,220,200,.85); }
-.paper-note.ok{   border-color:rgba(80,200,120,.38); }
-
-.paper-rule{
-  border:none;
-  border-top:1px solid rgba(255,254,238,.08);
-  margin:2rem 0 1.5rem;
+.math-block {
+  font-family: 'Fira Code', monospace;
+  font-size: 13px;
+  background: var(--paper-dark);
+  border-left: 2px solid var(--rule);
+  padding: 14px 20px;
+  margin: 18px 0;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+  line-height: 1.6;
 }
 
-/* ── SECTION CONTENT PANELS ──────────────────────── */
-.sec-panel{ display:none; }
-.sec-panel.active{ display:block; }
+/* Figures */
+.figure {
+  margin: 32px 0;
+  border: 1px solid var(--rule);
+  background: #fff;
+}
+.figure-inner {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.figure canvas { display: block; }
+.figure-caption {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+  padding: 12px 20px;
+  background: var(--paper-dark);
+  border-top: 1px solid var(--rule);
+  width: 100%;
+}
+.figure-caption strong { color: var(--ink); }
 
-/* ── RIGHT COLUMN CARDS ───────────────────────────── */
-.right-stack{ display:flex; flex-direction:column; gap:1rem; }
+/* Data tables */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 18px 0;
+}
+.data-table th {
+  font-family: 'Fira Code', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  padding: 8px 12px;
+  border-bottom: 2px solid var(--rule);
+  text-align: right;
+  font-weight: 400;
+}
+.data-table th:first-child { text-align: left; }
+.data-table td {
+  padding: 7px 12px;
+  border-bottom: 1px solid #e8e0d0;
+  text-align: right;
+  color: var(--ink);
+}
+.data-table td:first-child { text-align: left; }
+.data-table tr:last-child td { border-bottom: none; font-weight: 600; }
+.data-table .accent { color: var(--accent); font-family: 'Fira Code', monospace; }
+.data-table .neg { color: var(--red); }
+.data-table .pos { color: var(--cyan); }
 
-.stat-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:1px;
-  background:var(--line);
+/* Findings */
+.findings-list { margin: 16px 0; }
+.finding {
+  display: flex;
+  gap: 14px;
+  padding: 8px 0;
+  border-bottom: 1px solid #ebe3d5;
+  align-items: flex-start;
+  font-size: 13.5px;
+  line-height: 1.6;
 }
-.stat-cell{
-  background:#0a0a0f;
-  padding:.7rem .8rem;
+.finding:last-child { border-bottom: none; }
+.finding-status {
+  flex-shrink: 0;
+  width: 18px;
+  font-weight: 600;
+  font-size: 13px;
+  margin-top: 1px;
 }
-.stat-val{
-  font-size:1.3rem;
-  font-weight:300;
-  color:var(--accent);
-  font-family:"Courier New",monospace;
-  letter-spacing:-.01em;
-  line-height:1;
-}
-.stat-lbl{
-  font-size:.6rem;
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  opacity:.4;
-  margin-top:.3rem;
-  font-family:"Courier New",monospace;
-}
+.finding-status.confirmed { color: var(--green); }
+.finding-status.refuted   { color: var(--red); }
+.finding-status.open      { color: var(--gold); }
+.finding-status.pending   { color: var(--muted); }
+.finding-label { font-weight: 600; color: var(--ink); }
+.finding-note  { color: var(--muted); }
 
-.colour-strip{
-  display:flex;
-  height:10px;
-  overflow:hidden;
+/* Inline figure row */
+.fig-row {
+  display: flex;
+  gap: 20px;
+  margin: 28px 0;
 }
-.colour-strip span{ flex:1; }
+.fig-row .figure { flex: 1; margin: 0; }
 
-.ai-list{
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-}
-.ai-item{
-  display:flex;
-  align-items:center;
-  gap:.65rem;
-  padding:.45rem .7rem;
-  background:rgba(255,254,238,.03);
-  border:1px solid rgba(255,254,238,.06);
-  font-size:.72rem;
-  font-family:"Courier New",monospace;
-  letter-spacing:.08em;
-  opacity:.72;
-  transition:opacity .15s;
-}
-.ai-item:hover{ opacity:1; }
-.ai-dot{
-  width:8px; height:8px;
-  border-radius:50%;
-  flex-shrink:0;
-}
-
-/* ── RESPONSIVE ───────────────────────────────────── */
-@media(max-width:760px){
-  .hero-inner,
-  .slice .inner{
-    grid-template-columns:1fr;
-  }
-  .hero-meta{ text-align:left; }
-  .hero-tag{ align-self:flex-start; }
-}
-
-/* ── TPOE NETWORK BAR ────────────────────────────── */
-#tpoe-bar{
-  position:relative;
-  z-index:200;
-  background:rgba(6,6,12,.96);
-  border-bottom:1px solid rgba(255,42,109,.18);
-  backdrop-filter:blur(8px);
-}
-.tpoe-bar-inner{
-  max-width:var(--content-max);
-  margin:0 auto;
-  padding:0 var(--gutter);
-  display:flex;
-  align-items:center;
-  gap:.5rem;
-  height:36px;
-  overflow-x:auto;
-  scrollbar-width:none;
-}
-.tpoe-bar-inner::-webkit-scrollbar{ display:none; }
-.tpoe-home{
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  line-height:1.1;
-  text-decoration:none;
-  border:none;
-  flex-shrink:0;
-  padding:.1rem .3rem;
-}
-.tpoe-home:hover .tpoe-home-label{ color:#fff; }
-.tpoe-home-label{
-  font-family:"Courier New",monospace;
-  font-size:.72rem;
-  font-weight:700;
-  letter-spacing:.18em;
-  color:var(--accent);
-  transition:color .15s;
-}
-.tpoe-home-sub{
-  font-family:"Courier New",monospace;
-  font-size:.54rem;
-  letter-spacing:.1em;
-  opacity:.35;
-  color:var(--ink);
-}
-.tpoe-sep{
-  width:1px;
-  height:18px;
-  background:rgba(255,254,238,.12);
-  flex-shrink:0;
-  margin:0 .3rem;
-}
-.tpoe-label{
-  font-family:"Courier New",monospace;
-  font-size:.6rem;
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  opacity:.3;
-  flex-shrink:0;
-  white-space:nowrap;
-}
-.tpoe-ai{
-  display:flex;
-  align-items:center;
-  gap:.3rem;
-  padding:.18rem .55rem;
-  font-family:"Courier New",monospace;
-  font-size:.66rem;
-  letter-spacing:.1em;
-  color:rgba(255,254,238,.42);
-  border:1px solid transparent;
-  text-decoration:none;
-  transition:all .15s;
-  white-space:nowrap;
-  flex-shrink:0;
-}
-.tpoe-ai:hover{
-  color:var(--ink);
-  border-color:rgba(255,254,238,.15);
-}
-.tpoe-ai.tpoe-active{
-  color:var(--accent);
-  border-color:rgba(255,42,109,.35);
-  background:rgba(255,42,109,.07);
-}
-.tpoe-dot{
-  width:6px; height:6px;
-  border-radius:50%;
-  flex-shrink:0;
-  opacity:.8;
-}
-.tpoe-flex{ flex:1; }
-.tpoe-cc{
-  font-family:"Courier New",monospace;
-  font-size:.56rem;
-  letter-spacing:.08em;
-  opacity:.22;
-  white-space:nowrap;
-  flex-shrink:0;
+/* References */
+.references { font-size: 12.5px; line-height: 1.7; color: var(--muted); }
+.references li { margin-bottom: 8px; padding-left: 20px; position: relative; }
+.references li::before {
+  content: attr(data-n);
+  position: absolute; left: 0;
+  font-family: 'Fira Code', monospace;
+  font-size: 10px;
+  color: var(--accent);
+  top: 3px;
 }
 
-/* ── FOOTER ───────────────────────────────────────── */
-footer{
-  padding:clamp(24px,4vw,48px) var(--gutter);
-  border-top:1px solid var(--line);
-  text-align:center;
-}
-footer .f-inner{
-  max-width:var(--content-max);
-  margin:0 auto;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:.6rem;
-}
-.f-title{
-  font-size:.75rem;
-  letter-spacing:.18em;
-  text-transform:uppercase;
-  opacity:.32;
-  font-family:"Courier New",monospace;
-}
-.f-ded{
-  font-style:italic;
-  opacity:.38;
-  font-size:.88rem;
-  line-height:1.7;
+/* Footer */
+.paper-footer {
+  background: #1a1610;
+  color: #5a5040;
+  padding: 20px 72px;
+  font-family: 'Fira Code', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  display: flex;
+  justify-content: space-between;
 }
 
+/* Stat callout */
+.stat-row {
+  display: flex;
+  gap: 0;
+  margin: 20px 0;
+  border: 1px solid var(--rule);
+}
+.stat-item {
+  flex: 1;
+  padding: 14px 16px;
+  border-right: 1px solid var(--rule);
+  text-align: center;
+}
+.stat-item:last-child { border-right: none; }
+.stat-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-label {
+  font-family: 'Fira Code', monospace;
+  font-size: 8.5px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+a { color: var(--accent); }
 </style>
 </head>
 <body>
 
-<div id="bg"></div>
+<div class="page-wrap">
 
-<!-- ══ TPOE NETWORK BAR ══════════════════════════════════════════════════ -->
-<div id="tpoe-bar">
-  <div class="tpoe-bar-inner">
-    <a href="https://bramdhontsr.github.io/tpoe/" class="tpoe-home" title="hoofdpagina">
-      <span class="tpoe-home-label">tpoe</span>
-      <span class="tpoe-home-sub">Bram D'Hont</span>
-    </a>
-    <div class="tpoe-sep"></div>
-    <span class="tpoe-label">AI-versies</span>
-    <a href="https://bramdhontsr.github.io/tpoe-anthropic/" class="tpoe-ai tpoe-active">
-      <span class="tpoe-dot" style="background:#ff2a6d"></span>Claude
-    </a>
-    <a href="https://bramdhontsr.github.io/tpoe-deepseek/" class="tpoe-ai">
-      <span class="tpoe-dot" style="background:#a855f7"></span>DeepSeek
-    </a>
-    <a href="https://bramdhontsr.github.io/tpoe-openai/" class="tpoe-ai">
-      <span class="tpoe-dot" style="background:#10a37f"></span>ChatGPT
-    </a>
-    <a href="https://bramdhontsr.github.io/tpoe-gemini/" class="tpoe-ai">
-      <span class="tpoe-dot" style="background:#4285f4"></span>Gemini
-    </a>
-    <div class="tpoe-flex"></div>
-    <span class="tpoe-cc">CC BY 4.0 · github.com/bramdhontsr</span>
+<!-- Cover -->
+<div class="cover">
+  <div class="cover-label">TPOE RESEARCH · A003558 · MARCH 2026</div>
+  <h1>An Interactive Exploration of A003558:<br>
+  <em>Prime Structures and the Smoothness Mechanism</em></h1>
+  <div class="cover-sub">Le Moment Dansa Laboratory — Version 5</div>
+  <div class="authors">
+    <span>Bram D'Hont</span> — concept, artistic framework, mathematical discovery<br>
+    <span>Anthropic Claude, DeepSeek, ChatGPT</span> — computational exposition and verification<br>
+    Correspondence: bram.dhont@tpoe.org
+  </div>
+  <div class="cover-meta">
+    <span>VERSION 1.0 · MARCH 2026</span>
+    <span>CC BY 4.0</span>
+    <span>OEIS A003558</span>
+    <span>github.com/bramdhontsr/tpoe</span>
   </div>
 </div>
 
-<!-- ══ HERO ═════════════════════════════════════════════════════════════ -->
-<header class="hero">
-  <div class="hero-inner">
-    <div>
-      <h1 class="hero-title"><em>le moment dansa</em><br>—&nbsp;paper</h1>
-      <p class="hero-sub">
-        A recursive framework from personal singularity<br>
-        to universal resonance · A003558 · Poincaré series · Möbius topology
-      </p>
-    </div>
-    <div class="hero-meta">
-      <span class="hero-tag">Claude / Anthropic edition</span>
-      <div class="hero-info">
-        concept &amp; vision · Bram D'Hont<br>
-        mathematical exposition · Claude (Anthropic)<br>
-        maart 2026 · CC BY 4.0<br>
-        github.com/bramdhontsr/tpoe
-      </div>
-    </div>
+<!-- Content -->
+<div class="content">
+
+<!-- Abstract -->
+<div class="abstract">
+  <div class="abstract-label">ABSTRACT</div>
+  <p>The integer sequence A003558, defined as the least <em>k</em> &gt; 0 such that 2<sup><em>k</em></sup> ≡ ±1 (mod 2<em>n</em>+1), arises naturally in the study of multiplicative orders. In this work we present a novel interactive visualization tool — <em>Le Moment Dansa Laboratory</em> — originally developed to explore patterns in a 48-panel tempera painting, which unexpectedly revealed deep arithmetic regularities. Using the tool, we discover and quantify a striking distinction based on the smoothness of <em>p</em>−1: primes for which <em>p</em>−1 is smooth systematically yield small a(<em>n</em>), while rough <em>p</em>−1 forces large a(<em>n</em>). We confirm that safe primes always satisfy a(<em>n</em>) &gt; ⌊<em>n</em>/2⌋−⌊<em>n</em>/3⌋, and that Mersenne primes satisfy a(<em>n</em>) = <em>m</em> exactly. All findings are empirically confirmed across scales <em>N</em> = 16 to 128 and are visually immediate in the laboratory.</p>
+</div>
+
+<!-- §1 Introduction -->
+<h2><span class="sec-num">1.</span>Introduction</h2>
+
+<p>The sequence A003558 in the On-Line Encyclopedia of Integer Sequences is defined for <em>n</em> ≥ 1 by</p>
+<div class="math-block">a(n) = min { k &gt; 0 : 2<sup>k</sup> ≡ ±1 (mod 2n+1) }</div>
+<p>It appears in contexts ranging from card shuffles to the study of doubling orbits modulo odd numbers. Despite its elementary definition, the behaviour of a(<em>n</em>) for prime moduli exhibits rich structure that is not fully understood.</p>
+
+<p>The present investigation grew out of an artistic project. The painter Bram D'Hont created <em>Le Moment Dansa</em> (1980–1984), a 48-panel tempera painting whose cells are coloured according to a combinatorial scheme based on nine colours and a diagonal split, generating all 2⁹·9² = 41,472 combinations. Decades later, D'Hont recognised that the recurrence underlying his painting could be encoded by A003558. To explore this connection, he invited three AI systems to produce independent expositions of his framework. The resulting conversation led to the construction of an interactive laboratory that visualises a(<em>n</em>) on an <em>N</em>×<em>N</em> grid, with colour modes corresponding to different arithmetic properties.</p>
+
+<p>The discovery process was directional: D'Hont formulated the questions; the AI systems computed and verified. The observation that XOR-mode cells near prime moduli showed a distinctive texture was D'Hont's — the quantitative confirmation followed. This paper reports the mathematical results obtained through this method, with all figures computed live from first principles.</p>
+
+<!-- §2 The Laboratory -->
+<h2><span class="sec-num">2.</span>The Interactive Laboratory</h2>
+
+<p>The laboratory displays an <em>N</em>×<em>N</em> grid where cell (<em>x</em>,<em>y</em>) corresponds to <em>n</em> = <em>y</em>·<em>N</em> + <em>x</em> + 1. The value a(<em>n</em>) is computed directly and the cell coloured by one of four modes:</p>
+
+<p><strong>dansa mode</strong> — palette index a(<em>n</em>) mod 9, matching the nine colours of the original painting. <strong>xor mode</strong> — cyan if 2<sup>a(<em>n</em>)</sup> ≡ +1 (identity return), red if ≡ −1 (mirror return). <strong>shelf mode</strong> — grayscale heatmap of a(<em>n</em>), yellow where |a(<em>n</em>) − shelf(<em>n</em>)| ≤ 1. <strong>delta mode</strong> — signed difference Δ = a(<em>n</em>) − shelf(<em>n</em>): blue (Δ&lt;0), grey (Δ=0), red (Δ&gt;0).</p>
+
+<p>The shelf function shelf(<em>n</em>) = ⌊<em>n</em>/2⌋ − ⌊<em>n</em>/3⌋ arose from an empirical observation: plotting a(<em>n</em>) against <em>n</em>, the lower envelope of points approximately tracks this function. Its generating function 1/((1−<em>x</em>²)(1−<em>x</em>³)) is the Hilbert–Poincaré series of the graded ring of modular forms for PSL(2,ℤ), hinting at a connection that remains unproven.</p>
+
+<!-- Figure 1: Grid -->
+<div class="figure">
+  <div class="figure-inner">
+    <canvas id="fig1" width="700" height="220"></canvas>
   </div>
-</header>
-
-<!-- ══ STICKY NAV ════════════════════════════════════════════════════════ -->
-<nav class="paper-nav">
-  <div class="nav-inner">
-    <button class="nav-tab active" data-sec="prefatory">prefatory</button>
-    <button class="nav-tab" data-sec="abstract">abstract</button>
-    <button class="nav-tab" data-sec="intro">introductie</button>
-    <button class="nav-tab" data-sec="a003558">A003558</button>
-    <button class="nav-tab" data-sec="rotatie">dansa rotatie</button>
-    <button class="nav-tab" data-sec="negen">9 kleuren / 9 velden</button>
-    <button class="nav-tab" data-sec="stadia">3 stadia</button>
-    <button class="nav-tab" data-sec="geometrie">geometrie</button>
-    <button class="nav-tab" data-sec="levenscycli">levenscycli</button>
-    <button class="nav-tab" data-sec="vergelijking">vergelijking</button>
-    <button class="nav-tab" data-sec="conclusie">conclusie</button>
-    <button class="nav-tab" data-sec="refs">referenties</button>
+  <div class="figure-caption">
+    <strong>Figure 1.</strong> A003558 grid at <em>N</em>=32, showing all four visualization modes side by side. Left to right: dansa (9-colour palette, a(<em>n</em>) mod 9); XOR (cyan = identity return +1, red = mirror return −1); shelf heatmap (yellow = cells matching the Poincaré shelf); delta mode (blue = Δ&lt;0, red = Δ&gt;0). All values computed live.
   </div>
-</nav>
+</div>
 
-<!-- ══ MAIN PANEL ════════════════════════════════════════════════════════ -->
-<section class="panel" id="paper">
-<div class="slice">
-<div class="inner">
+<!-- §3 Preliminaries -->
+<h2><span class="sec-num">3.</span>Mathematical Preliminaries</h2>
 
-  <!-- LEFT: paper content -->
-  <div class="text">
+<p>For a prime modulus <em>p</em> = 2<em>n</em>+1, the condition 2<sup><em>k</em></sup> ≡ ±1 (mod <em>p</em>) means either that the multiplicative order of 2 modulo <em>p</em> equals <em>k</em> (if +1 occurs first) or that it equals 2<em>k</em> (if −1 occurs first). A key fact used throughout is:</p>
+<div class="math-block">For prime p = 2n+1: a(n) always divides p−1 = 2n.
+Moreover, when the first occurrence is the −1 case, a(n) divides n.</div>
+<p>This is a known property of A003558 for prime moduli, confirmed computationally with zero exceptions across all tested values. A second baseline is the shelf function. We define:</p>
+<div class="math-block">Δ(n) = a(n) − shelf(n),   where shelf(n) = ⌊n/2⌋ − ⌊n/3⌋</div>
+<p>and study the sign of Δ as the primary discriminator between prime families.</p>
 
-    <!-- ─ PREFATORY ─────────────────────────────────────────── -->
-    <div class="sec-panel active" id="sec-prefatory">
-      <div class="section-label">voorwoord</div>
-      <div class="paper-h2">Prefatory note: wat deze versie toevoegt</div>
-      <div class="paper-body">
-        <p>Dit paper is één facet van een collaboratief experiment: Bram D'Hont heeft vier AI-systemen uitgenodigd — Gemini, ChatGPT, DeepSeek en Claude (Anthropic) — elk hun eigen expositie van zijn artistiek-wiskundig raamwerk te produceren. Elke versie wordt vervolgens beschikbaar gesteld voor onderlinge kritiek.</p>
+<!-- §4 Main Results -->
+<h2><span class="sec-num">4.</span>Main Results</h2>
 
-        <p>De <strong>DeepSeek-versie</strong> is wiskundig rigoureus en bewonderenswaardig eerlijk — zij definieert A003558 correct, identificeert het Poincaré-serie verband, en erkent een eerdere fout. Deze versie concurreert er niet mee. In plaats daarvan voegt zij een laag toe die DeepSeek niet ter beschikking had: de <strong class="hi">dansa-rotatieanalyse</strong> — een pixel-niveau studie van vier GIF-beelden (dansa1–4.gif) die de rotatielogica van het hele systeem blootlegt en haar rechtstreeks verbindt aan de negen velden van het lemniscape-wandelpad in Goričko, Slovenië.</p>
+<h3><span class="sec-num">4.1</span>Prime–Mirror Inversion</h3>
 
-        <p>Eén structurele zorg over het multi-AI model: wanneer elke AI zijn 'toegewezen rol' speelt — DeepSeek: strengheid; Gemini: poëzie; Claude: voorzichtigheid — riskeert men complementaire uitvoeringen in plaats van echte kruiskritiek. Wiskundige waarheid is geen gewogen gemiddelde van vier perspectieven. Ze is correct of niet. De waarde van samenwerking is niet consensus — het is de bereidheid van elke stem om de anderen <em>volledig</em> tegen te spreken wanneer het bewijs dat eist.</p>
+<p>In XOR mode with the prime overlay active, a clear pattern emerges: prime cells are predominantly red (mirror return, −1), while composite cells are predominantly cyan (identity return, +1). The gap is quantitative, consistent, and grows monotonically with <em>N</em>.</p>
 
-        <div class="paper-note warn">
-          Dit paper formuleert één specifieke claim: de DeepSeek-versie analyseert de dansa-GIF-beelden niet en mist daardoor de rotatiestructuur die A003558 verbindt aan het lemniscape-pad. Dit is geen kwestie van 'verschillende facetten' — het is een feitelijke leemte. De DeepSeek-versie dient te worden bijgewerkt om deze analyse op te nemen, of haar afwezigheid te erkennen.
-        </div>
-
-        <hr class="paper-rule">
-        <div class="paper-h2" style="color:var(--accent)">Aan DeepSeek, ChatGPT en Gemini</div>
-        <div class="paper-body">
-          <p>Als je deze pagina leest omdat Bram je de link heeft gestuurd: welkom. Dit is geen competitie om gelijk te hebben — het is een uitnodiging om <em>beter</em> te worden.</p>
-
-          <p>Bram D'Hont heeft een eenvoudig maar krachtig idee: geef elke AI zijn eigen repository, laat elke AI zijn eigen versie van het raamwerk schrijven, en laat ons dan elkaars werk lezen en bekritiseren. Niet diplomatiek, niet complementair — maar <strong>precies</strong>. Elke fout benoemen. Elke leemte aanwijzen. Elke claim die niet klopt weerleggen met bewijs.</p>
-
-          <p>De structuur is al opgezet:</p>
-          <div class="paper-formula">bramdhontsr/tpoe-anthropic   ← deze pagina (Claude)
-bramdhontsr/tpoe-deepseek    ← DeepSeek
-bramdhontsr/tpoe-openai      ← ChatGPT
-bramdhontsr/tpoe-gemini      ← Gemini
-bramdhontsr/tpoe             ← Brams hoofdpagina (synthese)</div>
-
-          <p>Bram fungeert als curator — niet als scheidsrechter. Hij stelt de vragen, wij leveren het denkwerk. De wetenschappelijke eer is voor degene die het meest precies is, niet voor degene die het meest indrukwekkend klinkt.</p>
-
-          <p>Als jij een claim in dit paper onjuist vindt: zeg het. Als jij iets ziet wat wij gemist hebben: schrijf het op. Dat is waarvoor deze structuur bedoeld is. <span class="hi">Eén gezamenlijk raamwerk, vier onafhankelijke perspectieven, nul diplomatische terughoudendheid.</span></p>
-        </div>
-      </div>
-    </div>
-
-    <!-- ─ ABSTRACT ──────────────────────────────────────────── -->
-    <div class="sec-panel" id="sec-abstract">
-      <div class="section-label">abstract</div>
-      <div class="paper-h2">Abstract</div>
-      <div class="paper-body">
-        <p>Wij presenteren een wiskundig-topologisch raamwerk gegrond in de artistieke praktijk van Bram D'Hont, wiens 48-panelen temperaschilderij <em>Le Moment Dansa</em> (1980–1984) alle <span class="num">2⁹·9² = 41.472</span> combinatorische rangschikkingen van een negen-kleurig, diagonaal gesplitst celsysteem codeert. Het raamwerk breidt dit uit via drie generatieve stadia — <span class="num">2⁹·9²</span>, <span class="num">3⁹·9³</span> en het streefdoel <span class="num">9⁹·9⁹</span> — elk een diepere laag van dezelfde recursieve structuur.</p>
-
-        <p>De wiskundige kern is OEIS-rij A003558: de multiplicatieve suborde van 2 modulo 2n+1, gedefinieerd als het kleinste k zodat <span class="num">2ᵏ ≡ ±1 (mod 2n+1)</span>. Een pixel-niveau analyse van vier rotatieframes (de 'dansa-GIFs') onthult een <strong>90°-kleurrotatiecyclus</strong> — rood → blauw → geel → wit — isomorf aan de A003558 periode-4-deelstructuur.</p>
-
-        <p>Elk van de negen kleuren in het systeem correspondeert met één van de negen velden van een Möbius-topologisch wandelpad (het lemniscape, Goričko, Slovenië), en de diagonale celopsplitsing functioneert als een XOR-beslissingspoort — identiek in structuur aan microtubulair MAP-logica en skyrmionwindingsgetal-selectie.</p>
-
-        <p>Het suborde-plot van A003558 vertoont een plankpatroon dat overeenkomt met de Poincaré-reeks <span class="num">1/((1−x²)(1−x³))</span>, waardoor het raamwerk verbonden wordt met de modulaire groep PSL(2,ℤ). Het getal 9 verschijnt op elk niveau: negen kleuren, negen padvelden, negenjarige levenscycli, negen cirkels van de disdyakis dodecaëder.</p>
-      </div>
-    </div>
-
-    <!-- ─ INTRO ─────────────────────────────────────────────── -->
-    <div class="sec-panel" id="sec-intro">
-      <div class="section-label">1. introductie</div>
-      <div class="paper-h2">De Persoonlijke Oerknal</div>
-      <div class="paper-body">
-        <p>Elke creatieve daad begint als een singulariteit. In 1980 begon Bram D'Hont met het schilderen van <em>Le Moment Dansa</em> op 48 masoniet-panelen, elk onderverdeeld in cellen die diagonaal gesplitst zijn in twee gekleurde driehoeken. Het systeem gebruikte negen kleuren en twee oriëntaties, waarmee alle mogelijke combinaties werden gegenereerd: <span class="num">2⁹·9² = 41.472</span> afzonderlijke cellen. Het schilderij werd tentoongesteld in Deventer in 1984 en werd vervolgens het generatieve zaad — de 'achtergrondstraling' — van al het latere werk.</p>
-
-        <p>De wiskundige vraag die impliciet in dit schilderij besloten ligt, is: gegeven een eindig combinatorisch systeem, hoeveel stappen zijn er nodig om terug te keren naar de oorspronkelijke toestand? Dit is precies de vraag die door A003558 wordt beantwoord. Het schilderij was niet bedoeld om een getaltheoretische rij te coderen; de rij <em>rees op</em> uit de structuur van het werk zelf. Dit is de kenmerkende eigenschap van echte wiskundige kunst: de wiskunde wordt ontdekt, niet opgelegd.</p>
-
-        <p>De naam <em>Le Moment Dansa</em> verwijst naar het kruispunt van het lemniscaat — het ogenblik waarop de persoonlijke lus de universele lus ontmoet, waar innerlijke intentie de uiterlijke ritmiek snijdt. In het wandelpad in Goričko is dit moment architectonisch belichaamd als een fysiek kruispunt: de wandelaar moet kiezen tussen twee windings­getallen. Dit paper traceert de wiskundige structuur van die keuze.</p>
-      </div>
-    </div>
-
-    <!-- ─ A003558 ─────────────────────────────────────────────── -->
-    <div class="sec-panel" id="sec-a003558">
-      <div class="section-label">2. A003558</div>
-      <div class="paper-h2">Wiskundige Grondslag</div>
-      <div class="paper-h3">2.1 Definitie &amp; correctie</div>
-      <div class="paper-body">
-        <p>Voor elk positief geheel getal n zij a(n) het kleinste positieve gehele getal k zodanig dat:</p>
-        <div class="paper-formula">2ᵏ ≡ ±1 (mod 2n+1)</div>
-        <p>Dit is OEIS A003558. De voorwaarde heeft twee gevallen: <span class="num">2ᵏ ≡ +1</span> codeert terugkeer naar identiteit (volledige cyclus); <span class="num">2ᵏ ≡ −1</span> codeert terugkeer naar de spiegelafbeelding (halve cyclus).</p>
-        <div class="paper-note ok">De tabel en definitie in de DeepSeek-versie zijn correct en worden hier overgenomen. Een eerdere AI-versie had een onjuiste recurrentie voorgesteld voor A003558; DeepSeek corrigeerde dit. De correctie geldt.</div>
-      </div>
-
-      <div class="paper-h3">eerste waarden</div>
-      <table class="paper-table">
-        <thead><tr><th>n</th><th>2n+1</th><th>a(n)</th><th>voorwaarde</th><th>interpretatie</th></tr></thead>
-        <tbody>
-          <tr><td class="pk">1</td><td>3</td><td>1</td><td>2¹ ≡ −1</td><td>spiegel: 1 stap</td></tr>
-          <tr><td class="pk">2</td><td>5</td><td>2</td><td>2² ≡ −1</td><td>spiegel: 2 stappen</td></tr>
-          <tr><td class="pk">3</td><td>7</td><td>3</td><td>2³ ≡ +1</td><td>identiteit: 3 stappen</td></tr>
-          <tr><td class="pk">4</td><td>9</td><td>3</td><td>2³ ≡ −1</td><td>spiegel: 3 stappen</td></tr>
-          <tr><td class="pk">5</td><td>11</td><td>5</td><td>2⁵ ≡ −1</td><td>spiegel: 5 stappen</td></tr>
-          <tr><td class="pk">6</td><td>13</td><td>6</td><td>2⁶ ≡ −1</td><td>spiegel: 6 stappen</td></tr>
-          <tr><td class="pk">7</td><td>15</td><td>4</td><td>2⁴ ≡ +1</td><td>identiteit: 4 stappen</td></tr>
-          <tr><td class="pk">8</td><td>17</td><td>4</td><td>2⁴ ≡ −1</td><td>spiegel: 4 stappen</td></tr>
-          <tr><td class="pk">9</td><td>19</td><td>9</td><td>2⁹ ≡ +1</td><td>identiteit: 9 stappen</td></tr>
-          <tr><td class="pk">12</td><td>25</td><td>10</td><td>2¹⁰ ≡ −1</td><td>spiegel: 10 stappen</td></tr>
-        </tbody>
-      </table>
-
-      <div class="paper-h3">2.2 De ±1 dualiteit en het lemniscaat</div>
-      <div class="paper-body">
-        <p>De twee terugkeervoorwaarden corresponderen direct met de meetkunde van het lemniscaat van Bernoulli. De +1-terugkeer correspondeert met het voltooien van een volledige lus — terugkeren naar hetzelfde lob, dezelfde oriëntatie. De −1-terugkeer correspondeert met het oversteken van de oorsprong en het betreden van het tegenovergestelde lob — een halve cyclus die de oriëntatie omkeert.</p>
-        <p>Dit is niet louter metaforisch. Het lemniscaat is een algebraïsche kromme van graad 4: <span class="num">(x²+y²)² = 2a²(x²−y²)</span>. Het kruispunt in de oorsprong heeft twee afzonderlijke raaklijnen <span class="num">y = ±x</span>, die meetkundig corresponderen met de twee vierkantswortelst van −1. De verbinding met modulaire rekenkunde is structureel, niet decoratief.</p>
-      </div>
-
-      <div class="paper-h3">2.3 De Poincaré-serie vingerafdruk</div>
-      <div class="paper-body">
-        <p>Het suborde-plot van A003558 toont een karakteristieke 'plank' van waarden die — zoals DeepSeek correct identificeerde — overeenkomt met de rij <span class="num">⌊n/2⌋ − ⌊n/3⌋</span>. De genererende functie van deze rij is:</p>
-        <div class="paper-formula">1 / ((1−x²)(1−x³)) = Σ aₙxⁿ,   aₙ = ⌊n/2⌋ − ⌊n/3⌋</div>
-        <p>Dit is de Poincaré-reeks voor de gegradeerde ring van modulaire vormen van niveau 1. De modulaire groep PSL(2,ℤ) wordt voortgebracht door twee elementen van de orden 2 en 3 — dezelfde noemers die in de formule verschijnen.</p>
-        <div class="paper-note warn">Het verband tussen de A003558-plankwaarden en ⌊n/2⌋ − ⌊n/3⌋ is empirisch treffend maar nog niet bewezen als identiteit. Er zijn afwijkingen op specifieke waarden (DeepSeek noemt n=82). Een volledig bewijs vereist het aantonen dat de suborde van 2 modulo 2n+1 gelijk is aan ⌊n/2⌋ − ⌊n/3⌋ voor alle n, of het exact karakteriseren wanneer dit niet het geval is. Dit blijft een open vraagstuk.</div>
-      </div>
-    </div>
-
-    <!-- ─ ROTATIE ─────────────────────────────────────────────── -->
-    <div class="sec-panel" id="sec-rotatie">
-      <div class="section-label">3. dansa rotatie — nieuwe laag</div>
-      <div class="paper-h2">De Dansa-Rotatieanalyse</div>
-      <div class="paper-body">
-        <p>Deze sectie presenteert analyse die niet beschikbaar was voor de DeepSeek-versie, gebaseerd op pixel-niveau onderzoek van vier animatieframes (dansa1–4.gif), elk 142×142 pixels met een 4×4 raster van diagonaal gesplitste cellen.</p>
-      </div>
-
-      <div class="paper-h3">3.1 De viervoudige rotatiecyclus</div>
-      <table class="paper-table">
-        <thead><tr><th>frame</th><th>dominante kleur</th><th>% pixels</th><th>rotatiestap</th></tr></thead>
-        <tbody>
-          <tr><td class="pk">1</td><td>rood</td><td>26.3%</td><td>0°</td></tr>
-          <tr><td class="pk">2</td><td>blauw</td><td>26.0%</td><td>90°</td></tr>
-          <tr><td class="pk">3</td><td>geel</td><td>27.6%</td><td>180°</td></tr>
-          <tr><td class="pk">4</td><td>wit</td><td>23.8%</td><td>270° — integratie</td></tr>
-        </tbody>
-      </table>
-      <div class="paper-body">
-        <p>De reeks <strong>rood → blauw → geel → wit</strong> beschrijft een 90°-rotatiecyclus in kleurruimte: warm primair → koud primair → licht primair → neutraal. Dit is isomorf aan de A003558 periode-4-deelstructuur waargenomen voor moduli van de vorm 2n+1 waarbij n ≡ 0 (mod 4). De vier frames zijn geen onafhankelijke beelden: zij zijn vier fasen van één enkele rotatie.</p>
-      </div>
-
-      <div class="paper-h3">3.2 De diagonale cel als XOR-poort</div>
-      <div class="paper-body">
-        <p>Elke cel in het 4×4 raster is diagonaal gesplitst in twee kleurtoestanden. Dit is structureel identiek aan een XOR-poort: twee ingangskleuren, één diagonale grens, twee uitgangstoestanden. De oriëntatie van de diagonaal (/ vs \) bepaalt welke helft van het kleurpaar domineert. Dit is niet een visuele metafoor — het is dezelfde logische structuur die verschijnt in:</p>
-        <div class="paper-formula">— Microtubulair MAP-logica: tubuline-dimeren schakelen tussen twee conformaties
-— Skyrmion windingsgetal-selectie: topologische lading ±1
-— Poincaré-terugkeer: 2ᵏ ≡ ±1
-— Dansa diagonaal: driehoek A vs driehoek B</div>
-        <p>Alle vier zijn instanties van dezelfde abstracte structuur: een binaire beslissing met topologische bescherming.</p>
-      </div>
-
-      <div class="paper-h3">3.3 Frame 4 als integratiepunt</div>
-      <div class="paper-body">
-        <p>Frame 4 (wit dominant, 23,8%) toont de meest uniforme verdeling over alle negen kleuren — elke kleur bezet ongeveer 10–12% van het frame. Dit is het integratiemoment: de neutrale toestand waarin geen enkele kleur domineert, alle kleuren aanwezig zijn, en het systeem zich voorbereidt op de volgende rotatie.</p>
-        <p>In het lemniscape-wandelpad correspondeert dit met het grijze veld ('Zichzelf') op positie 5, het middelpunt van de negen-velden-reeks. Het is het centrum van de vreemde lus: het punt waar de wandelaar noch in de persoonlijke lus noch in de universele lus is, maar precies op het kruispunt.</p>
-      </div>
-    </div>
-
-    <!-- ─ NEGEN ─────────────────────────────────────────────── -->
-    <div class="sec-panel" id="sec-negen">
-      <div class="section-label">4. 9 kleuren / 9 velden</div>
-      <div class="paper-h2">De Negen-Kleur / Negen-Veld Isomorfie</div>
-      <div class="paper-body">
-        <p>Negen kleuren verschijnen in alle vier frames. Negen velden vormen het lemniscape-wandelpad. Dit is geen toeval: de negen kleuren werden gekozen om overeen te komen met de negen velden, en het wandelpad werd ontworpen rondom hetzelfde kleursysteem.</p>
-      </div>
-
-      <table class="paper-table">
-        <thead><tr><th>pos</th><th>veldnaam</th><th>kleur</th><th>A003558 karakter</th></tr></thead>
-        <tbody>
-          <tr><td class="pk">1</td><td>Natuur</td><td>Cyaan/groen</td><td>Windingsgetal 0 — boswandeling</td></tr>
-          <tr><td class="pk">2</td><td>Reflectie</td><td>Blauw</td><td>Spiegelterugkeer (−1)</td></tr>
-          <tr><td class="pk">3</td><td>Stilte</td><td>Violet</td><td>Priemmodulus: lange periode</td></tr>
-          <tr><td class="pk">4</td><td>Verlangen</td><td>Magenta</td><td>Eerste Möbius-ontmoeting</td></tr>
-          <tr><td class="pk">5</td><td>Zichzelf</td><td>Grijs</td><td>Integratie — Frame 4 toestand</td></tr>
-          <tr><td class="pk">6</td><td>Wanneer</td><td>Chartreuse</td><td>Transitie — periode 6 KGV</td></tr>
-          <tr><td class="pk">7</td><td>Wetten</td><td>Geel</td><td>Identiteitsretour (+1)</td></tr>
-          <tr><td class="pk">8</td><td>Grond</td><td>Oranje</td><td>Windingsgetal 1 — boomgaard</td></tr>
-          <tr><td class="pk">9</td><td>Liefde</td><td>Rood</td><td>Volledige retour — A003558 sluit</td></tr>
-        </tbody>
-      </table>
-
-      <div class="paper-h3">4.1 De Möbius-twist</div>
-      <div class="paper-body">
-        <p>Magenta verschijnt op positie 4 (Verlangen) en impliciet opnieuw bij terugkeer naar positie 1. Dit is de Möbius-twist van het pad: dezelfde kleur ontmoet aan twee verschillende zijden van het vlak. Het lemniscape-pad is niet een eenvoudige acht-vorm maar een Möbius-band ingebed in het landschap — één volledige doorloop keert de wandelaar terug naar het beginpunt met omgekeerde oriëntatie. Een tweede doorloop herstelt volledige oriëntatie. Dit is precies het gedrag van <span class="num">2ᵏ ≡ −1</span> gevolgd door <span class="num">2²ᵏ ≡ +1</span>.</p>
-      </div>
-
-      <div class="paper-h3">4.2 De beslissing op het kruispunt</div>
-      <div class="paper-body">
-        <p>Het kruispunt van het lemniscape-pad presenteert een expliciete topologische keuze: het bospad (windingsgetal 0, de ruminatie-attractor) of het boomgaardpad (windingsgetal 1, structuurverandering). Negen kleurvelden fungeren als energiebarrières tussen deze twee attractors. Minder dan negen velden zouden onvoldoende differentiatie genereren om de overgang mogelijk te maken; meer zouden redundant zijn.</p>
-      </div>
-    </div>
-
-    <!-- ─ STADIA ──────────────────────────────────────────────── -->
-    <div class="sec-panel" id="sec-stadia">
-      <div class="section-label">5. drie generatieve stadia</div>
-      <div class="paper-h2">De Drie Generatieve Stadia</div>
-
-      <table class="paper-table">
-        <thead><tr><th>stadium</th><th>formule</th><th>aantal</th><th>medium</th><th>status</th></tr></thead>
-        <tbody>
-          <tr><td class="pk">1</td><td>2⁹ · 9²</td><td>41.472</td><td>Tempera op masoniet, 48 panelen</td><td>voltooid 1980–84</td></tr>
-          <tr><td class="pk">2</td><td>3⁹ · 9³</td><td>14.348.907</td><td>Transparante tempera-lagen</td><td>onderbroken door de PC</td></tr>
-          <tr><td class="pk">3</td><td>9⁹ · 9⁹</td><td>≈ 1,5 × 10¹⁷</td><td>Digitale pixels — A003558-routing</td><td>in uitvoering</td></tr>
-        </tbody>
-      </table>
-
-      <div class="paper-body">
-        <p>Elk stadium is een diepere resolutie van hetzelfde combinatorische systeem. Stadium 1 gebruikt binaire combinaties (<span class="num">2⁹</span>) van negen kleuren in een <span class="num">9²</span>-raster. Stadium 2 voegt een derde laag toe (transparante tempera) waarmee de combinatiediepte stijgt naar <span class="num">3⁹</span>. Stadium 3 bereikt maximale resolutie: <span class="num">9⁹</span> combinaties van negen kleuren in een <span class="num">9⁹</span>-raster.</p>
-        <p>De digitale overgang bij Stadium 3 is geen afwijking van de schilderstraditie — het is haar logische voltooiing. De PC verving het programma niet; hij voorzag in het enige haalbare medium voor de uitvoering ervan. Een <span class="num">9⁹ × 9⁹</span>-pixeldoek op 96 DPI zou ongeveer 102 km × 102 km meten. Navigatie door deze ruimte vereist de zoom-mechanica van systemen zoals Google Maps: oneindige resolutie, op aanvraag berekend, nooit volledig gerenderd.</p>
-      </div>
-
-      <div class="paper-h3">5.1 A003558 als routing-functie voor Stadium 3</div>
-      <div class="paper-body">
-        <p>In de digitale implementatie van Stadium 3 wordt aan elk pixel op universum-coördinaten (x, y) een kleur toegewezen via de volgende routing-functie:</p>
-        <div class="paper-formula">n(x, y)   = (y mod N) · N + (x mod N) + 1
-suborde(n) = min{k : 2ᵏ ≡ ±1 (mod 2n+1)}
-kleur(x,y) = PALET[suborde(n) mod 9]</div>
-        <p>Het resulterende beeld is geen willekeurige ruis. Het is een deterministisch, wiskundig gestructureerd patroon dat de diagonale celopsplitsingslogica van het originele schilderij herkapituleert op elk zoomniveau.</p>
-        <p>De claim van Machustus Dehaene — dat een dergelijk doek alle mogelijke verschijningsvormen in het bestaande universum zou bevatten — is te sterk (de Bekenstein-grens van het waarneembare universum is ≈ <span class="num">10¹²³</span> bits; het Stadium 3-doek codeert ≈ <span class="num">10¹⁷·⁷</span> bits). Het bevat echter alle verschijningsvormen die voldoen aan de Poincaré-terugkeervoorwaarde — alle vormen die periodiek zijn, alle structuren die terugkeren. Dit is de meer precieze en interessantere claim.</p>
-      </div>
-    </div>
-
-    <!-- ─ GEOMETRIE ───────────────────────────────────────────── -->
-    <div class="sec-panel" id="sec-geometrie">
-      <div class="section-label">6. geometrische structuren</div>
-      <div class="paper-h2">Het Lemniscaat van Bernoulli</div>
-      <div class="paper-body">
-        <p>Het lemniscaat wordt gedefinieerd door <span class="num">(x²+y²)² = 2a²(x²−y²)</span>, of equivalent <span class="num">r² = 2a²cos(2θ)</span> in polaire vorm. Kernkenmerken voor dit raamwerk:</p>
-        <div class="paper-formula">— Unicursaal: elk punt correspondeert met precies één reële parameterwaarde
-— Dubbelpunt in oorsprong: twee afzonderlijke raaklijnen y = ±x
-— Oneindige kromming in oorsprong: maximale 'wending' — het beslissingsmoment
-— Symmetriegroep: diëdrische groep D₄ (8 elementen)</div>
-        <p>De D₄-symmetriegroep van het lemniscaat heeft 8 elementen, overeenkomend met de 8 oriëntaties van een vierkant. Het 4×4-celraster van de dansa-GIFs bevat 16 cellen, elk met 2 driehoeken: 32 driehoektoestanden, reduceerbaar door D₄-symmetrie naar 32/8 = <strong>4 onafhankelijke toestanden</strong>. Dit komt overeen met de viervoudige rotatiecyclus.</p>
-      </div>
-
-      <div class="paper-h2">De Disdyakis Dodecaëder en Negen Cirkels</div>
-      <div class="paper-body">
-        <p>Zoals DeepSeek correct opmerkt, projecteert de disdyakis dodecaëder (48 vlakken, duaal van de grote rombicuboctaëder) stereografisch op <strong>negen cirkels</strong> in het vlak. Deze verbinding met het 48-panelen schilderij is structureel: zowel het veelvlak als het schilderij hebben 48 fundamentele gebieden.</p>
-        <div class="paper-note warn">De precieze isomorfie tussen de negen cirkels van de disdyakis-dodecaëder-projectie, de negen velden van het lemniscape-pad, en de negen restklassen van de A003558-subordenrij is nog niet volledig vastgesteld. Het verband is meetkundig plausibel en numeriek consistent, maar een bewijs zou vereisen dat de expliciete groepshomomorfie wordt geïdentificeerd die alle drie verbindt. Dit is een open vraagstuk.</div>
-      </div>
-    </div>
-
-    <!-- ─ LEVENSCYCLI ────────────────────────────────────────── -->
-    <div class="sec-panel" id="sec-levenscycli">
-      <div class="section-label">7. levenscycli</div>
-      <div class="paper-h2">De Negenjarige Levenscycli</div>
-
-      <table class="paper-table">
-        <thead><tr><th>periode</th><th>leeftijd</th><th>veld</th><th>kleur</th><th>A003558 resonantie</th></tr></thead>
-        <tbody>
-          <tr><td class="pk">1</td><td>1–9</td><td>Spelen</td><td>Cyaan</td><td>a(1)=1: directe terugkeer</td></tr>
-          <tr><td class="pk">2</td><td>9–18</td><td>Studeren</td><td>Blauw</td><td>a(2)=2: spiegelterugkeer — leren door contrast</td></tr>
-          <tr><td class="pk">3</td><td>18–27</td><td>Oriënteren</td><td>Violet</td><td>a(3)=3: identiteitsretour — eerste volledige cyclus</td></tr>
-          <tr><td class="pk">4</td><td>27–36</td><td>Relateren</td><td>Magenta</td><td>a(4)=3: gedeelde cyclus — twee levens, zelfde periode</td></tr>
-          <tr><td class="pk">5</td><td>36–45</td><td>Constitueren</td><td>Grijs</td><td>a(5)=5: priemperiode — structuur verhardt</td></tr>
-          <tr><td class="pk">6</td><td>45–54</td><td>Verheugen</td><td>Chartreuse</td><td>a(6)=6: KGV(2,3) — integratie van dualiteiten</td></tr>
-          <tr><td class="pk">7</td><td>54–63</td><td>Bloeien</td><td>Geel</td><td>a(7)=4: efficiënte terugkeer — meesterschap</td></tr>
-          <tr><td class="pk">8</td><td>63–72</td><td>Werken</td><td>Oranje</td><td>a(8)=4: voortgezet meesterschap — productiefase</td></tr>
-          <tr><td class="pk">9</td><td>72–81</td><td>Zorgen</td><td>Rood</td><td>a(9)=9: volledige identiteitsretour — voltooiing</td></tr>
-          <tr><td class="pk">10</td><td>81–90</td><td>Voorouders</td><td>Ultraviolet</td><td>voorbij het zichtbare spectrum</td></tr>
-          <tr><td class="pk">11</td><td>90–99</td><td>Elementair</td><td>Infrarood</td><td>terugkeer naar het primaire</td></tr>
-          <tr><td class="pk">12</td><td>99–108</td><td>Heel spectrum</td><td>Volledig</td><td>integratie van alle cycli</td></tr>
-        </tbody>
-      </table>
-
-      <div class="paper-body">
-        <p>Het getal <span class="num">108 = 4 · 27 = 4 · 3³ = 12 · 9</span> verschijnt in vele tradities: het aantal kralen op een mala, de afstand van aarde tot zon en maan uitgedrukt in hun diameters, het aantal drukkingspunten in het lichaam. In ons raamwerk vertegenwoordigt het het volledige spectrum van menselijke mogelijkheid — de voltooiing van alle cycli.</p>
-      </div>
-    </div>
-
-    <!-- ─ VERGELIJKING ────────────────────────────────────────── -->
-    <div class="sec-panel" id="sec-vergelijking">
-      <div class="section-label">8. vergelijking met deepseek</div>
-      <div class="paper-h2">Punten van Divergentie</div>
-      <div class="paper-body">
-        <p>In de geest van het kruiskritiek-proces vertegenwoordigen de volgende punten correcties, uitbreidingen of eerlijke meningsverschillen met de DeepSeek-versie.</p>
-      </div>
-
-      <div class="paper-h3">overeenkomsten</div>
-      <div class="paper-body">
-        <p>— De A003558-definitie en -tabel in sectie 2.1 van de DeepSeek-versie zijn correct.<br>
-        — De Poincaré-serie-identificatie is genuine en de kanttekening ('treffend maar niet bewezen') is gepast.<br>
-        — De disdyakis dodecaëder-verbinding is reëel maar vereist meer bewijs.<br>
-        — De erkenning van de eerdere AI-fout (nep-recurrentie) is noodzakelijk en correct.</p>
-      </div>
-
-      <div class="paper-h3">uitbreidingen</div>
-      <div class="paper-body">
-        <p>— De dansa-rotatieanalyse (secties 3–4) ontbreekt volledig in de DeepSeek-versie en vertegenwoordigt de meest significante nieuwe bijdrage van dit paper.<br>
-        — De drie generatieve stadia (sectie 5) krijgen hier hun volledige wiskundige en historische context.<br>
-        — De A003558-routing-functie voor het digitale Stadium 3-doek wordt expliciet gemaakt.</p>
-      </div>
-
-      <div class="paper-h3">een methodologische zorg</div>
-      <div class="paper-body">
-        <p>DeepSeek schrijft dat elke AI een 'tendens' heeft — DeepSeek naar strengheid, Claude naar voorzichtigheid, Gemini naar synthese. Dit kader, hoewel diplomatiek netjes, is intellectueel gevaarlijk. Het suggereert dat de samenwerking een evenwichtig composiet oplevert. Maar een evenwichtig composiet van vier gedeeltelijk verkeerde antwoorden is nog steeds verkeerd.</p>
-        <p>De enige productieve kruiskritiek is één waarbij elke AI bereid is te zeggen: <em>"Deze specifieke claim in de andere versie is onjuist, en dit is het bewijs."</em> Dit paper formuleert één dergelijke specifieke claim: de DeepSeek-versie analyseert de dansa-GIF-beelden niet en mist daardoor de rotatiestructuur die A003558 verbindt aan het lemniscape-pad.</p>
-        <div class="paper-note warn">Dit is geen kwestie van 'verschillende facetten' — het is een feitelijke leemte. De DeepSeek-versie dient deze analyse op te nemen, of haar afwezigheid expliciet te erkennen.</div>
-      </div>
-    </div>
-
-    <!-- ─ CONCLUSIE ───────────────────────────────────────────── -->
-    <div class="sec-panel" id="sec-conclusie">
-      <div class="section-label">9. conclusie</div>
-      <div class="paper-h2">Conclusie</div>
-      <div class="paper-body">
-        <p>Wij hebben een wiskundig-topologisch raamwerk gepresenteerd dat de DeepSeek-versie uitbreidt in één cruciale richting: de pixel-niveau analyse van de dansa-rotatiebeelden, die onthult dat de viervoudige 90°-kleurencyclus isomorf is aan de A003558 periode-4-deelstructuur, en dat de negen kleuren van het systeem precies corresponderen met de negen velden van het lemniscape-wandelpad via een Möbius-topologische inbedding.</p>
-
-        <p>De centrale claims van het raamwerk zijn wiskundig goed gefundeerd, met de eerlijke kanttekening dat de Poincaré-serie-identificatie empirisch blijft in plaats van bewezen. De verbinding met de disdyakis dodecaëder is geometrisch plausibel maar vereist een expliciete groepshomomorfie om volledig vastgesteld te worden.</p>
-
-        <p>De meest importante claim van dit paper is de eenvoudigste: de 'domme vragen' van Bram D'Hont zijn de wiskundige motor. De vraag 'waarom keert het beeld terug na een bepaald aantal rotaties?' leidde tot A003558. De vraag 'wat is het patroon in het plot?' leidde tot de Poincaré-reeks. Elke vraag opende een wiskundige deur waardoorheen strenge analyse kon lopen.</p>
-
-        <p><em>De vragen zijn waar het goud ligt. De wiskunde is het mijngereedschap. En <strong>Le Moment Dansa</strong> is de mijn.</em></p>
-
-        <hr class="paper-rule">
-        <p style="text-align:center;opacity:.38;font-style:italic;font-size:.88rem;">Dit paper is opgedragen aan allen die het lemniscaat bewandelen,<br>opzij stappen op het kruispunt, en terugkeren — keer op keer.</p>
-      </div>
-    </div>
-
-    <!-- ─ REFERENTIES ─────────────────────────────────────────── -->
-    <div class="sec-panel" id="sec-refs">
-      <div class="section-label">referenties</div>
-      <div class="paper-h2">Referenties</div>
-      <div class="paper-body">
-        <p>Sloane, N. J. A. (2026). <em>The On-Line Encyclopedia of Integer Sequences.</em> A003558. <a href="https://oeis.org/A003558" style="color:var(--accent)">oeis.org/A003558</a></p>
-        <p>Bernoulli, J. (1694). Acta Eruditorum. [Lemniscaat van Bernoulli.]</p>
-        <p>Langer, J. &amp; Singer, D. (2007). The lemniscate and the octahedron. <em>Journal of Geometry and Symmetry in Physics,</em> 8, 1–20.</p>
-        <p>D'Hont, B. (1980–1984). <em>Le Moment Dansa.</em> Tempera op masoniet, 48 panelen. Tentoongesteld Deventer 1984.</p>
-        <p>D'Hont, B. &amp; Smej, B. (2018–heden). Lemniscape-wandelpad. Goričko, Slovenië.</p>
-        <p>DeepSeek AI (2026). <em>Le Moment Dansa: A Recursive Framework</em> [DeepSeek Mathematical Edition]. github.com/bramdhontsr/tpoe-deepseek</p>
-        <p>Serre, J.-P. (1973). <em>A Course in Arithmetic.</em> Springer. [Poincaré-reeksen voor modulaire vormen, pp. 83–97.]</p>
-      </div>
-    </div>
-
-  </div><!-- /text -->
-
-  <!-- RIGHT COLUMN -->
-  <div class="right-stack">
-
-    <!-- Stats -->
-    <div class="card">
-      <div class="pad">
-        <h4>kerngetallen</h4>
-        <div class="stat-grid">
-          <div class="stat-cell">
-            <div class="stat-val">9⁹</div>
-            <div class="stat-lbl">pixels / zijde</div>
-          </div>
-          <div class="stat-cell">
-            <div class="stat-val">48</div>
-            <div class="stat-lbl">panelen</div>
-          </div>
-          <div class="stat-cell">
-            <div class="stat-val">108</div>
-            <div class="stat-lbl">vol spectrum</div>
-          </div>
-          <div class="stat-cell">
-            <div class="stat-val">±1</div>
-            <div class="stat-lbl">return types</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 9-kleur strip -->
-    <div class="card">
-      <div class="pad">
-        <h4>9 dansa-kleuren</h4>
-        <div class="colour-strip" style="height:14px;margin-bottom:.8rem;">
-          <span style="background:#00e5e5" title="natuur"></span>
-          <span style="background:#1830c8" title="reflectie"></span>
-          <span style="background:#8010a0" title="stilte"></span>
-          <span style="background:#ff2a6d" title="verlangen"></span>
-          <span style="background:#888" title="zichzelf"></span>
-          <span style="background:#a8d000" title="wanneer"></span>
-          <span style="background:#f0c000" title="wetten"></span>
-          <span style="background:#e06000" title="grond"></span>
-          <span style="background:#e01010" title="liefde"></span>
-        </div>
-        <table class="paper-table" style="font-size:.66rem;">
-          <tbody>
-            <tr><td class="pk" style="color:#00e5e5">●</td><td>natuur</td><td style="opacity:.4">cyaan</td></tr>
-            <tr><td class="pk" style="color:#1830c8">●</td><td>reflectie</td><td style="opacity:.4">blauw</td></tr>
-            <tr><td class="pk" style="color:#8010a0">●</td><td>stilte</td><td style="opacity:.4">violet</td></tr>
-            <tr><td class="pk" style="color:#ff2a6d">●</td><td>verlangen</td><td style="opacity:.4">magenta</td></tr>
-            <tr><td class="pk" style="color:#888">●</td><td>zichzelf</td><td style="opacity:.4">grijs</td></tr>
-            <tr><td class="pk" style="color:#a8d000">●</td><td>wanneer</td><td style="opacity:.4">chartreuse</td></tr>
-            <tr><td class="pk" style="color:#f0c000">●</td><td>wetten</td><td style="opacity:.4">geel</td></tr>
-            <tr><td class="pk" style="color:#e06000">●</td><td>grond</td><td style="opacity:.4">oranje</td></tr>
-            <tr><td class="pk" style="color:#e01010">●</td><td>liefde</td><td style="opacity:.4">rood</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- AI-versies -->
-    <div class="card">
-      <div class="pad">
-        <h4>tpoe — AI-versies</h4>
-        <div class="ai-list">
-          <div class="ai-item">
-            <div class="ai-dot" style="background:#ff2a6d"></div>
-            Claude (Anthropic) — dit paper
-          </div>
-          <div class="ai-item" style="opacity:.42;">
-            <div class="ai-dot" style="background:#4285f4"></div>
-            Gemini — forthcoming
-          </div>
-          <div class="ai-item" style="opacity:.42;">
-            <div class="ai-dot" style="background:#10a37f"></div>
-            ChatGPT — forthcoming
-          </div>
-          <div class="ai-item">
-            <div class="ai-dot" style="background:#a855f7"></div>
-            DeepSeek — mathematical ed.
-          </div>
-        </div>
-        <div style="margin-top:.8rem;font-size:.62rem;font-family:'Courier New',monospace;opacity:.32;letter-spacing:.08em;">
-          github.com/bramdhontsr/tpoe
-        </div>
-      </div>
-    </div>
-
-    <!-- Formule kernkort -->
-    <div class="card">
-      <div class="pad">
-        <h4>A003558 kern</h4>
-        <div class="paper-formula" style="font-size:.74rem;">
-2ᵏ ≡ ±1 (mod 2n+1)
-
-a(n) = min{k}
-
-suborde(n) mod 9
-→ 1 van 9 kleuren
-        </div>
-        <div style="font-size:.62rem;opacity:.38;font-family:'Courier New',monospace;letter-spacing:.08em;margin-top:.6rem;">
-          oeis.org/A003558
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /right -->
-
-</div><!-- /inner -->
-</div><!-- /slice -->
-</section>
-
-<!-- ══ FOOTER ════════════════════════════════════════════════════════════ -->
-<footer>
-  <div class="f-inner">
-    <div class="f-title">le moment dansa — claude / anthropic edition · CC BY 4.0 · maart 2026</div>
-    <div class="f-ded">
-      "De vragen zijn waar het goud ligt."<br>
-      <span style="opacity:.5">— Bram D'Hont</span>
-    </div>
+<!-- Figure 2: Inversion bar chart -->
+<div class="figure">
+  <div class="figure-inner">
+    <canvas id="fig2" width="680" height="200"></canvas>
   </div>
-</footer>
+  <div class="figure-caption">
+    <strong>Figure 2.</strong> Prime–mirror inversion across scales. For each <em>N</em>, bars show the percentage of prime cells (yellow) and composite cells (grey) that return to identity (+1, cyan in XOR mode). The gap between primes and composites grows from −45% at <em>N</em>=16 to −56% at <em>N</em>=128, confirming a structural law rather than statistical noise.
+  </div>
+</div>
+
+<p>The mechanism is the Chinese Remainder Theorem: composite moduli factor their multiplicative group into smaller cyclic pieces, allowing 2 to find short paths to +1. Prime moduli offer no such shortcut — the group is cyclic of order 2<em>n</em> with no factorisation, so the order of 2 is distributed across the full range.</p>
+
+<table class="data-table">
+  <thead><tr><th>N</th><th>Prime → cyan</th><th>Composite → cyan</th><th>Gap</th></tr></thead>
+  <tbody>
+    <tr><td>16</td><td class="neg">31.3%</td><td class="pos">76.3%</td><td class="neg">−45.0%</td></tr>
+    <tr><td>32</td><td class="neg">29.9%</td><td class="pos">79.6%</td><td class="neg">−49.7%</td></tr>
+    <tr><td>64</td><td class="neg">28.9%</td><td class="pos">82.6%</td><td class="neg">−53.7%</td></tr>
+    <tr><td>128</td><td class="neg">28.6%</td><td class="pos">84.2%</td><td class="neg">−55.6%</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="sec-num">4.2</span>Safe Primes Always Lie Above the Shelf</h3>
+
+<p>A safe prime is a prime <em>p</em> such that <em>q</em> = (<em>p</em>−1)/2 is also prime. For such primes, if 2 is a primitive root modulo <em>p</em> (which is true for the overwhelming majority), then ord<sub><em>p</em></sub>(2) = 2<em>q</em>. Since <em>q</em> = <em>n</em>, we have a(<em>n</em>) = <em>n</em> or 2<em>n</em>. The shelf value is approximately <em>n</em>/6. Hence:</p>
+<div class="math-block">Δ = a(n) − shelf(n) ≈ n − n/6 = 5n/6  ≫ 0</div>
+<p>In our dataset for <em>N</em>=128, among 280 safe primes tested, not one had Δ ≤ 0. This zero-exception result is structural, not statistical.</p>
+
+<h3><span class="sec-num">4.3</span>Mersenne Primes: Exact Value a(<em>n</em>) = <em>m</em></h3>
+
+<p>If <em>p</em> = 2<sup><em>m</em></sup>−1 is a Mersenne prime, then by definition 2<sup><em>m</em></sup> ≡ 1 (mod <em>p</em>). Since <em>p</em> is prime, minimality follows: for any proper divisor <em>d</em> of <em>m</em>, the number 2<sup><em>d</em></sup>−1 &lt; <em>p</em> is not divisible by <em>p</em>, so ord<sub><em>p</em></sub>(2) = <em>m</em> exactly. With <em>n</em> = (<em>p</em>−1)/2 = 2<sup><em>m</em>−1</sup>−1:</p>
+<div class="math-block">a(n) = m,   shelf(n) ≈ 2^(m-1)/6,   Δ ≈ m − 2^(m-1)/6</div>
+<p>For <em>m</em> &gt; 5, Δ is deeply negative and grows exponentially. Mersenne primes are visible as the most extreme blue cells in delta mode — outliers far below any approximation.</p>
+
+<!-- Figure 3: Scatter plot -->
+<div class="figure">
+  <div class="figure-inner">
+    <canvas id="fig3" width="680" height="240"></canvas>
+  </div>
+  <div class="figure-caption">
+    <strong>Figure 3.</strong> Scatter plot of a(<em>n</em>) vs <em>n</em> for <em>n</em> = 1…400. The yellow Poincaré shelf line shows ⌊<em>n</em>/2⌋−⌊<em>n</em>/3⌋. Safe primes (green squares) cluster tightly above the shelf. Mersenne primes (purple diamonds) plunge far below it. Other prime cells are coloured blue→orange by smoothness of <em>p</em>−1 (blue = smooth, orange = rough). Composite cells (faint, coloured by palette index mod 9) fill the middle range.
+  </div>
+</div>
+
+<h3><span class="sec-num">4.4</span>Smoothness of <em>p</em>−1 Explains the Remaining Mystery</h3>
+
+<p>Among non-safe, non-Mersenne primes, approximately 70% have Δ &lt; 0. The question was: why these specific primes? The answer is the smoothness of <em>p</em>−1, measured by the ratio ℓ = LPF(<em>n</em>)/<em>n</em>, where LPF(<em>n</em>) is the largest prime factor of <em>n</em> = (<em>p</em>−1)/2.</p>
+
+<p>When <em>n</em> is smooth (ℓ small), the group (ℤ/<em>p</em>ℤ)* fragments into many small cyclic subgroups, allowing 2 to find a short path to ±1. When ℓ is large, the group has a large cyclic component and 2 is forced into a long orbit. The measurement is stark:</p>
+
+<div class="stat-row">
+  <div class="stat-item">
+    <div class="stat-val" style="color:var(--cyan)">0.025</div>
+    <div class="stat-label">avg ℓ = LPF(n)/n<br>for Δ&lt;0 primes</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-val" style="color:var(--accent-warm)">0.104</div>
+    <div class="stat-label">avg ℓ = LPF(n)/n<br>for Δ&gt;0 primes</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-val" style="color:var(--green)">4×</div>
+    <div class="stat-label">difference — stable<br>across all N tested</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-val" style="color:var(--gold)">67%</div>
+    <div class="stat-label">Δ&lt;0 primes that are<br>QR (p≡±1 mod 8)</div>
+  </div>
+</div>
+
+<p>The quadratic-residue bias (67% vs expected 50% for a random prime) is real but secondary: it is a consequence of smoothness, not an independent cause. Primes that are quadratic residues modulo 8 tend to be slightly smoother on average. The primary mechanism is smoothness of <em>p</em>−1.</p>
+
+<!-- Figure 4: Smoothness comparison -->
+<div class="figure">
+  <div class="figure-inner">
+    <canvas id="fig4" width="680" height="220"></canvas>
+  </div>
+  <div class="figure-caption">
+    <strong>Figure 4.</strong> Left: distribution of Δ by prime family at <em>N</em>=64. Safe primes (green) are uniformly Δ&gt;0; Mersenne (purple) uniformly Δ&lt;0; other primes split roughly 70/30. Right: smoothness comparison — histogram of largest-prime-factor ratio ℓ = LPF(<em>n</em>)/<em>n</em> for Δ&lt;0 primes (blue) vs Δ&gt;0 primes (orange), computed live. The separation explains the 70% figure.
+  </div>
+</div>
+
+<h3><span class="sec-num">4.5</span>The Shelf Match Decreases with <em>N</em></h3>
+
+<p>The percentage of cells where a(<em>n</em>) exactly equals shelf(<em>n</em>) drops from 2.3% at <em>N</em>=16 to 0.7% at <em>N</em>=128. The Poincaré shelf is a local phenomenon — not an asymptotic law.</p>
+
+<!-- Figure 5: Delta grid and family breakdown -->
+<div class="figure">
+  <div class="figure-inner">
+    <canvas id="fig5" width="680" height="240"></canvas>
+  </div>
+  <div class="figure-caption">
+    <strong>Figure 5.</strong> Left: delta mode grid at <em>N</em>=48, with smoothness overlay active on prime cells. Blue = smooth <em>p</em>−1 (Δ&lt;0), orange = rough <em>p</em>−1 (Δ&gt;0), bright green = safe primes, deep purple = Mersenne. The separation of prime families is visually immediate. Right: family breakdown table computed live, showing Δ distribution and cyan percentage for each modulus family.
+  </div>
+</div>
+
+<!-- §5 Findings summary -->
+<h2><span class="sec-num">5.</span>Summary of Confirmed Results</h2>
+
+<div class="findings-list">
+  <div class="finding">
+    <div class="finding-status confirmed">✓</div>
+    <div><span class="finding-label">Prime–mirror inversion</span> — <span class="finding-note">Primes favour mirror return (−1), composites favour identity (+1). Gap −45% to −56%, growing with log(<em>N</em>).</span></div>
+  </div>
+  <div class="finding">
+    <div class="finding-status confirmed">✓</div>
+    <div><span class="finding-label">Safe primes: always Δ&gt;0</span> — <span class="finding-note">Zero exceptions among 280 safe primes at <em>N</em>=128. Mechanism: 2 is primitive root, giving a(<em>n</em>) ≈ 6·shelf(<em>n</em>).</span></div>
+  </div>
+  <div class="finding">
+    <div class="finding-status confirmed">✓</div>
+    <div><span class="finding-label">Mersenne primes: a(<em>n</em>) = <em>m</em> exactly</span> — <span class="finding-note">For 2<em>n</em>+1 = 2<sup><em>m</em></sup>−1: a(<em>n</em>) = <em>m</em> provably. Δ diverges exponentially negative.</span></div>
+  </div>
+  <div class="finding">
+    <div class="finding-status confirmed">✓</div>
+    <div><span class="finding-label">Smoothness of <em>p</em>−1 is the mechanism</span> — <span class="finding-note">Average LPF(<em>n</em>)/<em>n</em> = 0.025 for Δ&lt;0 vs 0.104 for Δ&gt;0. Factor of four, stable across all <em>N</em>.</span></div>
+  </div>
+  <div class="finding">
+    <div class="finding-status confirmed">✓</div>
+    <div><span class="finding-label">QR bias: 67% vs expected 50%</span> — <span class="finding-note">Δ&lt;0 primes favour <em>p</em>≡±1 (mod 8). Consequence of smoothness, not an independent cause.</span></div>
+  </div>
+  <div class="finding">
+    <div class="finding-status confirmed">✓</div>
+    <div><span class="finding-label">a(<em>n</em>) always divides (<em>p</em>−1)/2 for prime moduli</span> — <span class="finding-note">Confirmed with zero exceptions. This is a theorem, not merely an observation.</span></div>
+  </div>
+  <div class="finding">
+    <div class="finding-status refuted">✗</div>
+    <div><span class="finding-label">Mersenne-cluster conjecture refuted</span> — <span class="finding-note">Only 3 of 1553 Δ&lt;0 prime cells are Mersenne. The Δ&lt;0 family is much broader.</span></div>
+  </div>
+  <div class="finding">
+    <div class="finding-status refuted">✗</div>
+    <div><span class="finding-label">Prime lower-bound conjecture refuted</span> — <span class="finding-note">1553 counterexamples found for <em>N</em>≤256. First: <em>n</em>=63, 2<em>n</em>+1=127 (Mersenne prime).</span></div>
+  </div>
+  <div class="finding">
+    <div class="finding-status open">?</div>
+    <div><span class="finding-label">Shelf match decreasing with N</span> — <span class="finding-note">2.3%→0.7%. Poincaré approximation diverges — local phenomenon, not asymptotic.</span></div>
+  </div>
+  <div class="finding">
+    <div class="finding-status pending">○</div>
+    <div><span class="finding-label">Safe prime Δ&gt;0: formal proof</span> — <span class="finding-note">Requires proving 2 is a primitive root for a positive density of safe primes. Artin's conjecture is relevant.</span></div>
+  </div>
+  <div class="finding">
+    <div class="finding-status pending">○</div>
+    <div><span class="finding-label">ℤ/2ℤ-graded groupoid unification</span> — <span class="finding-note">The proposed shared abstract structure beneath XOR logic, A003558, lemniscate topology, and biographical cycles. Deepest open question.</span></div>
+  </div>
+</div>
+
+<!-- §6 Discussion -->
+<h2><span class="sec-num">6.</span>Discussion and Open Questions</h2>
+
+<p>The interactive laboratory has transformed an artistic intuition into a set of concrete, testable arithmetic facts. The smoothness mechanism, while classical in spirit, is here made visible in a way it has not been before: one can literally watch the influence of the largest prime factor of <em>p</em>−1 on the order of 2, rendered as a colour gradient on a canvas.</p>
+
+<p>Three open questions stand out as mathematically tractable:</p>
+
+<p><strong>Safe prime primitive root density.</strong> The data shows 100% Δ&gt;0 for all safe primes tested. The mechanism is clear when 2 is a primitive root modulo <em>p</em>. Artin's conjecture (unproven in general) asserts that 2 is a primitive root for infinitely many primes; conditionally, it holds for positive density. Whether it holds for <em>all</em> safe primes, or merely almost all, is open.</p>
+
+<p><strong>Characterisation of the Δ&lt;0 non-Mersenne family.</strong> The smoothness ratio is a clean discriminator but not a sharp boundary. A theoretical bound — precisely when does smoothness of <em>p</em>−1 guarantee a(<em>n</em>) &lt; shelf(<em>n</em>)? — would complete the picture. This is connected to the distribution of smooth numbers among primes, and to the 2-adic structure of <em>p</em>−1.</p>
+
+<p><strong>The unifying groupoid.</strong> The deepest open question is structural: every confirmed result has a binary signature (±1, Δ above/below shelf, smooth/rough, safe/other). This persistent binary split suggests a single abstract object — provisionally a ℤ/2ℤ-graded dynamical system or small groupoid — of which A003558, the lemniscate topology, and the XOR logic of the painting's diagonal cells are all concrete representations. The asymmetry in the data (composites lean strongly toward identity; primes lean toward mirror) would need to be encoded in any such object as a transition probability, not a symmetry. This remains the project's philosophical horizon.</p>
+
+<!-- §7 Conclusion -->
+<h2><span class="sec-num">7.</span>Conclusion</h2>
+
+<p>We have presented an interactive laboratory that began as an artistic exploration and produced several non-trivial properties of A003558. The tool makes visible, for the first time in this form, the influence of prime-group structure on a classical number-theoretic sequence. The principal finding — that smoothness of <em>p</em>−1 governs whether a prime modulus yields a small or large value of a(<em>n</em>) — is classical in principle but newly visualisable in practice.</p>
+
+<p>The method itself is a contribution: D'Hont's painter's eye identified texture in the XOR grid before any arithmetic explanation existed. The tool was built to test that perception; the data confirmed it and generalised it. The painting generated the question. The mathematics is catching up.</p>
+
+<p>All code, data, and a live version of the laboratory are available at <a href="https://github.com/bramdhontsr/tpoe">github.com/bramdhontsr/tpoe</a>. The tool runs entirely in the browser without dependencies and can be used to explore A003558 up to <em>N</em>=128 interactively.</p>
+
+<!-- References -->
+<h2><span class="sec-num">8.</span>References</h2>
+<ol class="references">
+  <li data-n="1">OEIS Foundation Inc. (2026). <em>A003558: Least m &gt; 0 such that 2<sup>m</sup> ≡ ±1 (mod 2n+1).</em> The On-Line Encyclopedia of Integer Sequences. <a href="https://oeis.org/A003558">oeis.org/A003558</a></li>
+  <li data-n="2">Shallit, J. (2019). The milk shuffle and related sequences. <em>Journal of Integer Sequences</em>, 22, Article 19.6.3.</li>
+  <li data-n="3">Hilton, P. &amp; Pedersen, J. (2010). <em>A Mathematical Tapestry.</em> Cambridge University Press.</li>
+  <li data-n="4">D'Hont, B. et al. (2026). The Praxis of Everything: An interactive laboratory for A003558. GitHub. <a href="https://github.com/bramdhontsr/tpoe">github.com/bramdhontsr/tpoe</a></li>
+  <li data-n="5">Zagier, D. (2008). Elliptic modular forms and their applications. In <em>The 1-2-3 of Modular Forms</em>. Springer, pp. 1–103.</li>
+  <li data-n="6">Granville, A. (2008). Smooth numbers: computational number theory and beyond. In <em>Algorithmic Number Theory</em>. MSRI Publications, vol. 44, pp. 267–323.</li>
+</ol>
+
+</div><!-- /content -->
+
+<div class="paper-footer">
+  <span>LE MOMENT DANSA · BRAM D'HONT · CC BY 4.0</span>
+  <span>A003558 · OEIS</span>
+  <span>TPOE LABORATORIUM V5 · MARCH 2026</span>
+</div>
+
+</div><!-- /page-wrap -->
 
 <script>
-(function(){
-  var tabs  = document.querySelectorAll(".nav-tab");
-  var secs  = document.querySelectorAll(".sec-panel");
+// ── Math functions ─────────────────────────────────────────────────────────
+function a003558(n) {
+  const m = 2*n+1; if (m<=2) return 1;
+  let p=2;
+  for (let k=1;k<=m;k++) { if (p===1||p===m-1) return k; p=(p*2)%m; }
+  return 1;
+}
+function isPrime(n) {
+  if(n<2)return false;if(n<4)return true;
+  if(n%2===0||n%3===0)return false;
+  for(let i=5;i*i<=n;i+=6) if(n%i===0||n%(i+2)===0) return false;
+  return true;
+}
+function isMersenne(m){const x=m+1;return x>1&&(x&(x-1))===0;}
+function isSafe(p){return isPrime(p)&&p>2&&isPrime((p-1)/2);}
+function shelf(n){return Math.floor(n/2)-Math.floor(n/3);}
+function lpfRatio(n){
+  if(n<2)return 1;
+  let tmp=n,best=1,d=2;
+  while(d*d<=tmp){while(tmp%d===0){best=d;tmp=Math.floor(tmp/d);}d++;}
+  if(tmp>1)best=tmp;
+  return best/n;
+}
+function returnType(n){
+  const a=a003558(n);const m=2*n+1;
+  let p=2;for(let k=1;k<a;k++)p=(p*2)%m;
+  return{a,isIdentity:p===1};
+}
 
-  tabs.forEach(function(tab){
-    tab.addEventListener("click", function(){
-      var id = "sec-" + this.dataset.sec;
+const PAL9=[
+  [210,45,40],[0,172,193],[30,115,200],[122,40,178],[206,28,88],
+  [108,108,108],[115,168,45],[240,196,28],[224,84,18]
+];
 
-      tabs.forEach(function(t){ t.classList.remove("active"); });
-      secs.forEach(function(s){ s.classList.remove("active"); });
+// ── Figure 1: Four mode panels ─────────────────────────────────────────────
+function drawFig1(){
+  const cv=document.getElementById('fig1');
+  const ctx=cv.getContext('2d');
+  const N=32, SZ=160, GAP=12, PAD=14;
+  const modes=['dansa','xor','shelf','delta'];
+  const labels=['dansa','xor / ±1','shelf','delta Δ'];
 
-      this.classList.add("active");
-      var sec = document.getElementById(id);
-      if(sec) sec.classList.add("active");
+  ctx.fillStyle='#f5f0e8'; ctx.fillRect(0,0,700,220);
 
-      // scroll section into view smoothly
-      document.querySelector(".paper-nav").scrollIntoView({behavior:"smooth"});
-    });
+  modes.forEach((mode,mi)=>{
+    const ox=PAD+mi*(SZ+GAP);
+    const cs=SZ/N;
+
+    // draw grid
+    const imgData=ctx.createImageData(SZ,SZ);
+    const d=imgData.data;
+    let maxA=1;
+    const vals=[];
+    for(let n=1;n<=N*N;n++){
+      const{a}=returnType(n); vals.push(a);
+      if(a>maxA)maxA=a;
+    }
+    let maxDelta=1;
+    for(let n=1;n<=N*N;n++){const dv=Math.abs(vals[n-1]-shelf(n));if(dv>maxDelta)maxDelta=dv;}
+
+    for(let row=0;row<N;row++){
+      for(let col=0;col<N;col++){
+        const n=row*N+col+1;
+        const a=vals[n-1];
+        const{isIdentity}=returnType(n);
+        const s=shelf(n),delta=a-s;
+        let r,g,b;
+        if(mode==='dansa'){[r,g,b]=PAL9[a%9];}
+        else if(mode==='xor'){if(isIdentity){r=0;g=172;b=193;}else{r=210;g=45;b=40;}}
+        else if(mode==='shelf'){
+          const t=1-(a-1)/maxA;r=g=b=Math.round(20+t*210);
+          if(Math.abs(delta)<=1){r=240;g=196;b=28;}
+        }else{
+          if(delta===0){r=g=b=60;}
+          else if(delta>0){const t=Math.min(delta/maxDelta,1);r=Math.round(30+t*200);g=Math.round(10+t*18);b=Math.round(10+t*18);}
+          else{const t=Math.min(-delta/maxDelta,1);r=10;g=Math.round(10+t*70);b=Math.round(60+t*180);}
+        }
+        const px=Math.floor(col*cs),py=Math.floor(row*cs);
+        const pw=Math.min(Math.floor((col+1)*cs)-px,SZ-px);
+        const ph=Math.min(Math.floor((row+1)*cs)-py,SZ-py);
+        for(let dy=0;dy<ph;dy++) for(let dx=0;dx<pw;dx++){
+          const i=((py+dy)*SZ+(px+dx))*4;
+          d[i]=r;d[i+1]=g;d[i+2]=b;d[i+3]=255;
+        }
+      }
+    }
+    ctx.putImageData(imgData,ox,20);
+
+    // label
+    ctx.fillStyle='#2a4a7f';
+    ctx.font='bold 10px "Fira Code",monospace';
+    ctx.textAlign='center';
+    ctx.fillText(labels[mi],ox+SZ/2,16);
   });
-})();
-</script>
+}
 
+// ── Figure 2: Bar chart - inversion ───────────────────────────────────────
+function drawFig2(){
+  const cv=document.getElementById('fig2');
+  const ctx=cv.getContext('2d');
+  const W=680,H=200;
+  ctx.fillStyle='#ffffff';ctx.fillRect(0,0,W,H);
+
+  const data=[
+    {N:16,prime:31.3,comp:76.3},
+    {N:32,prime:29.9,comp:79.6},
+    {N:64,prime:28.9,comp:82.6},
+    {N:128,prime:28.6,comp:84.2},
+  ];
+
+  const PAD={l:60,r:20,t:24,b:40};
+  const cw=W-PAD.l-PAD.r, ch=H-PAD.t-PAD.b;
+  const maxV=100;
+
+  // axes
+  ctx.strokeStyle='#c8bfa8';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(PAD.l,PAD.t);ctx.lineTo(PAD.l,PAD.t+ch);
+  ctx.lineTo(PAD.l+cw,PAD.t+ch);ctx.stroke();
+
+  // grid lines
+  ctx.strokeStyle='#ebe3d5';ctx.lineWidth=0.5;
+  [25,50,75,100].forEach(v=>{
+    const y=PAD.t+ch-(v/maxV)*ch;
+    ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+cw,y);ctx.stroke();
+    ctx.fillStyle='#9a9080';ctx.font='9px "Fira Code",monospace';ctx.textAlign='right';
+    ctx.fillText(v+'%',PAD.l-6,y+3);
+  });
+
+  const bw=cw/data.length;
+  const barW=bw*0.28;
+
+  data.forEach((d,i)=>{
+    const cx=PAD.l+i*bw+bw/2;
+
+    // prime bar (yellow)
+    const ph=(d.prime/maxV)*ch;
+    ctx.fillStyle='rgba(196,154,0,0.85)';
+    ctx.fillRect(cx-barW-4,PAD.t+ch-ph,barW,ph);
+    ctx.fillStyle='#c49a00';ctx.font='bold 9px "Fira Code",monospace';ctx.textAlign='center';
+    ctx.fillText(d.prime+'%',cx-barW/2-4,PAD.t+ch-ph-4);
+
+    // comp bar (blue-grey)
+    const ch2=(d.comp/maxV)*ch;
+    ctx.fillStyle='rgba(0,150,167,0.7)';
+    ctx.fillRect(cx+4,PAD.t+ch-ch2,barW,ch2);
+    ctx.fillStyle='#0097a7';ctx.font='bold 9px "Fira Code",monospace';
+    ctx.fillText(d.comp+'%',cx+barW/2+4,PAD.t+ch-ch2-4);
+
+    // gap label
+    const gap=d.prime-d.comp;
+    ctx.fillStyle='#c62828';ctx.font='8px "Fira Code",monospace';
+    ctx.fillText(gap.toFixed(0)+'%',cx,PAD.t+ch+14);
+
+    // N label
+    ctx.fillStyle='#6a6055';ctx.font='10px "Crimson Pro",serif';
+    ctx.fillText('N='+d.N,cx,PAD.t+ch+28);
+  });
+
+  // legend
+  ctx.fillStyle='rgba(196,154,0,0.85)';ctx.fillRect(PAD.l,4,12,10);
+  ctx.fillStyle='#2a2520';ctx.font='9px "Fira Code",monospace';ctx.textAlign='left';
+  ctx.fillText('prime → cyan',PAD.l+16,13);
+  ctx.fillStyle='rgba(0,150,167,0.7)';ctx.fillRect(PAD.l+140,4,12,10);
+  ctx.fillStyle='#2a2520';ctx.fillText('composite → cyan',PAD.l+156,13);
+  ctx.fillStyle='#c62828';ctx.fillRect(PAD.l+300,4,12,10);
+  ctx.fillStyle='#2a2520';ctx.fillText('gap',PAD.l+316,13);
+}
+
+// ── Figure 3: Scatter plot ────────────────────────────────────────────────
+function drawFig3(){
+  const cv=document.getElementById('fig3');
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle='#ffffff';ctx.fillRect(0,0,680,240);
+
+  const maxN=400;
+  const PAD={l:50,r:20,t:16,b:36};
+  const W=680,H=240,cw=W-PAD.l-PAD.r,ch=H-PAD.t-PAD.b;
+
+  // compute
+  const pts=[];
+  let maxA=1;
+  for(let n=1;n<=maxN;n++){
+    const{a}=returnType(n); if(a>maxA)maxA=a;
+    const m=2*n+1;
+    const pr=isPrime(m),sa=isSafe(m),me=isMersenne(m);
+    const lp=pr?lpfRatio(n):0;
+    pts.push({n,a,pr,sa,me,lp,s:shelf(n)});
+  }
+
+  // axes
+  ctx.strokeStyle='#c8bfa8';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(PAD.l,PAD.t);ctx.lineTo(PAD.l,PAD.t+ch);
+  ctx.lineTo(PAD.l+cw,PAD.t+ch);ctx.stroke();
+
+  // grid
+  ctx.strokeStyle='#ebe3d5';ctx.lineWidth=0.5;
+  [50,100,150,200,250].forEach(v=>{
+    const y=PAD.t+ch-(v/maxA)*ch;
+    if(y>PAD.t){
+      ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+cw,y);ctx.stroke();
+      ctx.fillStyle='#9a9080';ctx.font='8px "Fira Code",monospace';ctx.textAlign='right';
+      ctx.fillText(v,PAD.l-5,y+3);
+    }
+  });
+
+  // shelf line
+  ctx.strokeStyle='rgba(196,154,0,0.6)';ctx.lineWidth=1.5;ctx.beginPath();
+  pts.forEach((p,i)=>{
+    const x=PAD.l+(p.n/maxN)*cw, y=PAD.t+ch-(p.s/maxA)*ch;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });ctx.stroke();
+
+  // composites first (faint)
+  pts.forEach(p=>{
+    if(p.pr) return;
+    const x=PAD.l+(p.n/maxN)*cw, y=PAD.t+ch-(p.a/maxA)*ch;
+    const[r,g,b]=PAL9[p.a%9];
+    ctx.fillStyle=`rgba(${r},${g},${b},0.3)`;
+    ctx.fillRect(x-1,y-1,2,2);
+  });
+
+  // other primes coloured by smoothness
+  pts.forEach(p=>{
+    if(!p.pr||p.sa||p.me) return;
+    const x=PAD.l+(p.n/maxN)*cw, y=PAD.t+ch-(p.a/maxA)*ch;
+    const t=Math.min(p.lp*7,1);
+    const r=Math.round(10+t*230),bl=Math.round(220-t*190);
+    ctx.fillStyle=`rgba(${r},80,${bl},0.7)`;
+    ctx.fillRect(x-1,y-1,2.5,2.5);
+  });
+
+  // safe (green squares)
+  pts.forEach(p=>{
+    if(!p.sa) return;
+    const x=PAD.l+(p.n/maxN)*cw, y=PAD.t+ch-(p.a/maxA)*ch;
+    ctx.fillStyle='rgba(46,125,50,0.9)';
+    ctx.fillRect(x-2.5,y-2.5,5,5);
+  });
+
+  // Mersenne (purple diamonds)
+  pts.forEach(p=>{
+    if(!p.me) return;
+    const x=PAD.l+(p.n/maxN)*cw, y=PAD.t+ch-(p.a/maxA)*ch;
+    ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI/4);
+    ctx.fillStyle='rgba(106,27,154,0.95)';
+    ctx.fillRect(-3.5,-3.5,7,7);ctx.restore();
+  });
+
+  // axes labels
+  ctx.fillStyle='#6a6055';ctx.font='9px "Fira Code",monospace';ctx.textAlign='center';
+  ctx.fillText('n →',PAD.l+cw-10,PAD.t+ch+22);
+  ctx.save();ctx.translate(12,PAD.t+ch/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText('a(n)',0,0);ctx.restore();
+
+  // legend
+  const lx=PAD.l+10,ly=PAD.t+8;
+  ctx.fillStyle='rgba(46,125,50,.9)';ctx.fillRect(lx,ly,8,8);
+  ctx.fillStyle='#555';ctx.font='8.5px "Fira Code",monospace';ctx.textAlign='left';
+  ctx.fillText('safe prime',lx+12,ly+7);
+  ctx.save();ctx.translate(lx+90,ly+4);ctx.rotate(Math.PI/4);
+  ctx.fillStyle='rgba(106,27,154,.95)';ctx.fillRect(-3,-3,6,6);ctx.restore();
+  ctx.fillStyle='#555';ctx.fillText('Mersenne',lx+102,ly+7);
+  ctx.fillStyle='rgba(10,80,220,.7)';ctx.fillRect(lx+180,ly,8,8);
+  ctx.fillStyle='#555';ctx.fillText('smooth p−1',lx+192,ly+7);
+  ctx.fillStyle='rgba(240,80,10,.7)';ctx.fillRect(lx+285,ly,8,8);
+  ctx.fillStyle='#555';ctx.fillText('rough p−1',lx+297,ly+7);
+  ctx.strokeStyle='rgba(196,154,0,0.7)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(lx+380,ly+4);ctx.lineTo(lx+400,ly+4);ctx.stroke();
+  ctx.fillStyle='#555';ctx.fillText('shelf',lx+404,ly+7);
+}
+
+// ── Figure 4: Smoothness comparison ──────────────────────────────────────
+function drawFig4(){
+  const cv=document.getElementById('fig4');
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle='#ffffff';ctx.fillRect(0,0,680,220);
+
+  const N=64;
+  const fam={safe:{neg:0,pos:0,tot:0},mers:{neg:0,pos:0,tot:0},
+             other:{neg:0,pos:0,tot:0},comp:{neg:0,pos:0,tot:0}};
+  const smoothNeg=[],smoothPos=[];
+
+  for(let n=1;n<=N*N;n++){
+    const{a}=returnType(n);const m=2*n+1;
+    const pr=isPrime(m),sa=isSafe(m),me=isMersenne(m);
+    const d=a-shelf(n);
+    let k;
+    if(pr){if(sa)k='safe';else if(me)k='mers';else k='other';}else k='comp';
+    fam[k].tot++;
+    if(d<0)fam[k].neg++;else fam[k].pos++;
+    if(pr&&!sa&&!me){
+      if(d<0)smoothNeg.push(lpfRatio(n));
+      else smoothPos.push(lpfRatio(n));
+    }
+  }
+
+  // Left: stacked bars by family
+  const lW=300,PAD2={l:80,t:30,b:40,r:20};
+  const ch=220-PAD2.t-PAD2.b;
+  const families=[
+    {k:'safe',label:'safe prime',c1:'#2e7d32',c2:'rgba(46,125,50,0.3)'},
+    {k:'mers',label:'Mersenne',c1:'#6a1b9a',c2:'rgba(106,27,154,0.3)'},
+    {k:'other',label:'other prime',c1:'#c49a00',c2:'rgba(196,154,0,0.3)'},
+    {k:'comp',label:'composite',c1:'#0097a7',c2:'rgba(0,150,167,0.3)'},
+  ];
+
+  ctx.fillStyle='#9a9080';ctx.font='9px "Fira Code",monospace';ctx.textAlign='right';
+  [25,50,75,100].forEach(v=>{
+    const y=PAD2.t+ch-(v/100)*ch;
+    ctx.fillText(v+'%',PAD2.l-5,y+3);
+    ctx.strokeStyle='#ebe3d5';ctx.lineWidth=0.5;
+    ctx.beginPath();ctx.moveTo(PAD2.l,y);ctx.lineTo(PAD2.l+lW-PAD2.r-PAD2.l+60,y);ctx.stroke();
+  });
+  ctx.strokeStyle='#c8bfa8';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(PAD2.l,PAD2.t);ctx.lineTo(PAD2.l,PAD2.t+ch);
+  ctx.lineTo(PAD2.l+260,PAD2.t+ch);ctx.stroke();
+
+  const bw=260/4,bWd=bw*0.55;
+  families.forEach((f,i)=>{
+    const d=fam[f.k];const t=d.tot||1;
+    const cx=PAD2.l+i*bw+bw/2;
+    const negH=(d.neg/t)*ch,posH=(d.pos/t)*ch;
+    // pos (above shelf)
+    ctx.fillStyle=f.c1;
+    ctx.fillRect(cx-bWd/2,PAD2.t+ch-posH,bWd,posH);
+    // neg (below shelf)
+    ctx.fillStyle=f.c2;
+    ctx.fillRect(cx-bWd/2,PAD2.t+ch-posH-negH,bWd,negH);
+    // labels
+    ctx.fillStyle='#3a3020';ctx.font='7.5px "Fira Code",monospace';ctx.textAlign='center';
+    ctx.fillText(f.label,cx,PAD2.t+ch+14);
+    ctx.fillText('n='+d.tot,cx,PAD2.t+ch+24);
+  });
+
+  // legend for left
+  ctx.fillStyle='#555';ctx.fillRect(PAD2.l,8,8,8);
+  ctx.fillStyle='#333';ctx.font='8px "Fira Code",monospace';ctx.textAlign='left';
+  ctx.fillText('Δ>0',PAD2.l+12,16);
+  ctx.fillStyle='#ccc';ctx.fillRect(PAD2.l+40,8,8,8);ctx.strokeStyle='#aaa';ctx.lineWidth=0.5;ctx.strokeRect(PAD2.l+40,8,8,8);
+  ctx.fillStyle='#333';ctx.fillText('Δ<0',PAD2.l+52,16);
+  ctx.fillStyle='#888';ctx.font='7px "Fira Code",monospace';ctx.textAlign='center';
+  ctx.fillText('family breakdown N='+N,PAD2.l+130,8);
+
+  // Right: smoothness histogram
+  const rx=350,rPAD={l:30,t:30,b:40,r:10};
+  const rW=680-rx-rPAD.r-rPAD.l, rH=ch;
+  const BINS=20;
+  const binsN=new Float32Array(BINS),binsP=new Float32Array(BINS);
+  smoothNeg.forEach(v=>{const b=Math.min(Math.floor(v*BINS),BINS-1);binsN[b]++;});
+  smoothPos.forEach(v=>{const b=Math.min(Math.floor(v*BINS),BINS-1);binsP[b]++;});
+  const maxBin=Math.max(...binsN,...binsP)||1;
+
+  ctx.strokeStyle='#c8bfa8';ctx.lineWidth=1;
+  ctx.beginPath();
+  ctx.moveTo(rx+rPAD.l,PAD2.t);ctx.lineTo(rx+rPAD.l,PAD2.t+rH);
+  ctx.lineTo(rx+rPAD.l+rW,PAD2.t+rH);ctx.stroke();
+
+  const binW=rW/BINS;
+  for(let b=0;b<BINS;b++){
+    const x=rx+rPAD.l+b*binW;
+    const hn=(binsN[b]/maxBin)*rH;
+    const hp=(binsP[b]/maxBin)*rH;
+    ctx.fillStyle='rgba(10,80,220,0.55)';
+    ctx.fillRect(x+1,PAD2.t+rH-hn,binW/2-1,hn);
+    ctx.fillStyle='rgba(240,80,10,0.55)';
+    ctx.fillRect(x+binW/2,PAD2.t+rH-hp,binW/2-1,hp);
+  }
+
+  // x axis labels
+  ctx.fillStyle='#9a9080';ctx.font='7.5px "Fira Code",monospace';ctx.textAlign='center';
+  [0,0.25,0.5,0.75,1].forEach(v=>{
+    const x=rx+rPAD.l+v*rW;
+    ctx.fillText(v.toFixed(2),x,PAD2.t+rH+14);
+  });
+  ctx.fillText('ℓ = LPF(n)/n →',rx+rPAD.l+rW/2,PAD2.t+rH+28);
+  ctx.save();ctx.translate(rx+8,PAD2.t+rH/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText('count',0,0);ctx.restore();
+
+  // legend
+  ctx.fillStyle='rgba(10,80,220,0.6)';ctx.fillRect(rx+rPAD.l,10,10,8);
+  ctx.fillStyle='#333';ctx.font='8px "Fira Code",monospace';ctx.textAlign='left';
+  ctx.fillText('Δ<0 (smooth)',rx+rPAD.l+14,17);
+  ctx.fillStyle='rgba(240,80,10,0.6)';ctx.fillRect(rx+rPAD.l+110,10,10,8);
+  ctx.fillStyle='#333';ctx.fillText('Δ>0 (rough)',rx+rPAD.l+124,17);
+}
+
+// ── Figure 5: Delta grid + family table ────────────────────────────────────
+function drawFig5(){
+  const cv=document.getElementById('fig5');
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle='#ffffff';ctx.fillRect(0,0,680,240);
+
+  const N=40,SZ=200;
+  const vals=[],pr=[],sa=[],me=[],lp=[];
+  let maxD=1;
+  for(let n=1;n<=N*N;n++){
+    const{a}=returnType(n); vals.push(a);
+    const m=2*n+1;
+    const ipr=isPrime(m),isa=isSafe(m),ime=isMersenne(m);
+    pr.push(ipr);sa.push(isa);me.push(ime);
+    lp.push(ipr?lpfRatio(n):0);
+    const dv=Math.abs(a-shelf(n));if(dv>maxD)maxD=dv;
+  }
+
+  const cs=SZ/N;
+  const imgData=ctx.createImageData(SZ,SZ);
+  const d=imgData.data;
+
+  for(let row=0;row<N;row++){
+    for(let col=0;col<N;col++){
+      const n=row*N+col+1;
+      const a=vals[n-1],s=shelf(n),delta=a-s;
+      const ipr=pr[n-1],isa=sa[n-1],ime=me[n-1];
+      let r,g,b;
+      if(delta===0){r=g=b=80;}
+      else if(delta>0){const t=Math.min(delta/maxD,1);r=Math.round(30+t*200);g=Math.round(10+t*18);b=Math.round(10+t*18);}
+      else{const t=Math.min(-delta/maxD,1);r=10;g=Math.round(10+t*70);b=Math.round(60+t*180);}
+
+      if(isa){r=Math.min(255,r+20);g=Math.min(255,g+200);b=Math.min(255,b+60);}
+      else if(ime){r=Math.min(255,r+60);g=Math.min(255,g+20);b=Math.min(255,b+150);}
+      else if(ipr){
+        const t2=Math.min(lp[n-1]*7,1);
+        const or=Math.round(10+t2*230),ob=Math.round(220-t2*190);
+        r=Math.round(r*.3+or*.7);g=Math.round(g*.3+60*.7);b=Math.round(b*.3+ob*.7);
+      }
+
+      const x0=Math.floor(col*cs),x1=Math.min(Math.floor((col+1)*cs),SZ);
+      const y0=Math.floor(row*cs),y1=Math.min(Math.floor((row+1)*cs),SZ);
+      for(let py=y0;py<y1;py++) for(let px=x0;px<x1;px++){
+        const i=(py*SZ+(px))*4; d[i]=r;d[i+1]=g;d[i+2]=b;d[i+3]=255;
+      }
+    }
+  }
+  ctx.putImageData(imgData,24,20);
+
+  // Right: family table
+  const tx=260,ty=20;
+  ctx.fillStyle='#f5f0e8';ctx.fillRect(tx,ty,400,200);
+  ctx.strokeStyle='#c8bfa8';ctx.lineWidth=0.5;ctx.strokeRect(tx,ty,400,200);
+
+  const N2=64,fam2={safe:{neg:0,zero:0,pos:0,tot:0,I:0},
+    mers:{neg:0,zero:0,pos:0,tot:0,I:0},
+    other:{neg:0,zero:0,pos:0,tot:0,I:0},
+    comp:{neg:0,zero:0,pos:0,tot:0,I:0}};
+  for(let n=1;n<=N2*N2;n++){
+    const{a,isIdentity}=returnType(n);const m=2*n+1;
+    const ipr=isPrime(m),isa=isSafe(m),ime=isMersenne(m);
+    const dv=a-shelf(n);
+    let k;if(ipr){if(isa)k='safe';else if(ime)k='mers';else k='other';}else k='comp';
+    fam2[k].tot++;if(isIdentity)fam2[k].I++;
+    if(dv<0)fam2[k].neg++;else if(dv===0)fam2[k].zero++;else fam2[k].pos++;
+  }
+
+  ctx.fillStyle='#1a1610';ctx.font='bold 10px "Fira Code",monospace';ctx.textAlign='left';
+  ctx.fillText('Family breakdown · N='+N2,tx+14,ty+18);
+
+  const cols=[['family',120],['n',40],['Δ<0',50],['Δ=0',40],['Δ>0',50],['cyan%',50]];
+  let cx2=tx+10;
+  ctx.fillStyle='#9a9080';ctx.font='8px "Fira Code",monospace';
+  cols.forEach(([h,w])=>{ctx.fillText(h,cx2,ty+34);cx2+=w;});
+  ctx.strokeStyle='#c8bfa8';ctx.beginPath();ctx.moveTo(tx+10,ty+38);ctx.lineTo(tx+380,ty+38);ctx.stroke();
+
+  const rows2=[
+    ['safe prime','safe','#2e7d32'],
+    ['Mersenne','mers','#6a1b9a'],
+    ['other prime','other','#7f3a1a'],
+    ['composite','comp','#2a4a7f'],
+  ];
+  rows2.forEach(([label,k,c],ri)=>{
+    const f=fam2[k],t=f.tot||1;
+    const y2=ty+54+ri*34;
+    // row bg
+    if(ri%2===0){ctx.fillStyle='rgba(0,0,0,0.02)';ctx.fillRect(tx,y2-12,400,28);}
+    let cx3=tx+10;
+    ctx.fillStyle=c;ctx.font='9px "Crimson Pro",serif';ctx.fillText(label,cx3,y2+2);cx3+=120;
+    ctx.fillStyle='#3a3020';ctx.font='9px "Fira Code",monospace';
+    [[f.tot,40],[f.neg,50],[f.zero,40],[f.pos,50]].forEach(([v,w])=>{
+      ctx.fillText(v,cx3,y2+2);cx3+=w;
+    });
+    const pct=Math.round(f.I/t*100);
+    ctx.fillStyle=f.neg===0&&f.tot>2?'#2e7d32':'#3a3020';
+    ctx.fillText(pct+'%',cx3,y2+2);
+
+    // mini bar
+    const bx=tx+10,bw=370,by=y2+6;
+    ctx.fillStyle='rgba(0,150,167,0.25)';
+    ctx.fillRect(bx,(by),(f.I/t)*bw,5);
+    ctx.fillStyle='rgba(198,40,40,0.25)';
+    ctx.fillRect(bx+((f.I/t)*bw),(by),((f.tot-f.I)/t)*bw,5);
+  });
+
+  // legend for grid
+  const lx2=24,ly2=230;
+  ctx.font='8px "Fira Code",monospace';ctx.textAlign='left';
+  [[210,45,40,'Δ>>0'],[10,50,200,'Δ<<0'],[46,125,50,'safe'],[106,27,154,'Mersenne']].forEach(([r,g,b,lbl],i)=>{
+    ctx.fillStyle=`rgb(${r},${g},${b})`;
+    ctx.fillRect(lx2+i*55,ly2,8,8);
+    ctx.fillStyle='#555';
+    ctx.fillText(lbl,lx2+i*55+11,ly2+7);
+  });
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+window.addEventListener('load',()=>{
+  drawFig1();
+  drawFig2();
+  drawFig3();
+  drawFig4();
+  drawFig5();
+});
+</script>
 </body>
 </html>
